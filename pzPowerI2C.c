@@ -72,12 +72,18 @@ void init(void) {
 	setup_oscillator(OSC_16MHZ);
 
 	setup_adc(ADC_CLOCK_DIV_16);
-	setup_adc_ports(sAN4,VSS_VDD);
-	setup_vref(VREF_1v024);
+	setup_adc_ports(sAN4,VSS_VREF);
+	setup_vref(VREF_4v096); 
 
+	set_tris_a(0b00101011);
+	set_tris_b(0b01110000);
+	set_tris_c(0b00000001);
+//               76543210
 
-	port_a_pullups(0b00111111);
-	port_b_pullups(0b01011111);
+	port_a_pullups(0b00101011);
+	port_b_pullups(0b00000000);
+//	port_c_pullups(0b00000000);
+//                   76543210
 
 	/* data structure initialization */
 	timers.led_on_green=0;
@@ -199,19 +205,13 @@ void main(void) {
 
 	init();
 
-//	output_high(PI_POWER_EN);
+	output_low(PI_POWER_EN);
 
-#if 1
-	for ( i=0 ; i<100 ; i++ ) {
-		output_high(PIC_LED_GREEN);
-		delay_ms(50);
-		output_low(PIC_LED_GREEN);
-		delay_ms(50);
-	}
-#endif
+	strcpy(buffer,"hello, world!");
+//                 0123456789012345
 
-#if 1
-	fprintf(STREAM_PI,"# pcPower %s\r\n",__DATE__);
+#if 0
+	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
 	fprintf(STREAM_PI,"# restart_cause()=%u ",i);
 
 	switch ( i ) {
@@ -229,6 +229,9 @@ void main(void) {
 
 
 	read_param_file();
+
+	/* 100 minutes before power cycle */
+	config.watchdog_seconds_max=6030;
 
 
 
@@ -251,10 +254,20 @@ void main(void) {
 
 	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
 
+	/* enable I2C slave interrupt */
+	enable_interrupts(INT_SSP);
+
 	for ( ; ; ) {
 		restart_wdt();
 
 //		output_bit(PIC_LED_GREEN,input(SW_MAGNET));
+
+		if ( ! input(SW_MAGNET) ) {
+			timers.led_on_green=100;
+		} else {
+			timers.led_on_green=0;
+		}
+
 
 		if ( timers.now_millisecond ) {
 			periodic_millisecond();

@@ -2,6 +2,7 @@
 #device ADC=12
 #device *=16
 #use delay(clock=16MHz)
+#use i2c(SLAVE, I2C1, address=0xA0, FORCE_HW)
 
 #fuses INTRC_IO
 #fuses NOPLLEN
@@ -44,5 +45,3 @@ Parameters are stored in EEPROM
 
 #define EE_FOR_HOST_ADDRESS 128
 
-#byte TXSTA=GETENV("SFR:txsta")
-#bit  TRMT=TXSTA.1

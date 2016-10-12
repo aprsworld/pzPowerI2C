@@ -9,6 +9,8 @@ unsigned int8 address, buffer[16];
 void ssp_interrupt () {
 	unsigned int8 incoming, state;
 
+	static int16 lastValue;
+
 	state = i2c_isr_state();
 
 	if(state <= 0x80) {                      //Master is sending data
@@ -24,7 +26,17 @@ void ssp_interrupt () {
 	}
 
 	if(state >= 0x80) {                     //Master is requesting data
-		i2c_write(buffer[address++]);
+		if ( 0 == address%2 ) {
+			/* read 16 bit register on even address */
+			lastValue=map_i2c(address);
+			i2c_write(make8(lastValue,1));
+		} else {
+			/* send other byte of 16 bit register on odd address */
+			i2c_write(make8(lastValue,0));
+		}
+//		i2c_write(buffer[address++]);
+
+		address++;
 	}
 
 }

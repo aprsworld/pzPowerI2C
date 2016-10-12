@@ -7,18 +7,8 @@
 #define MAX_EE_REGISTER              MIN_EE_REGISTER + 512
 
 
-/* This function may come in handy for you since MODBUS uses MSB first. */
-int8 swap_bits(int8 c) {
-	return ((c&1)?128:0)|((c&2)?64:0)|((c&4)?32:0)|((c&8)?16:0)|((c&16)?8:0)|((c&32)?4:0)|((c&64)?2:0)|((c&128)?1:0);
-}
 
-void reset_modbus_stats(void) {
-	current.modbus_our_packets=0;
-	current.modbus_other_packets=0;
-	current.modbus_last_error=0;
-}
-
-int16 map_modbus(int16 addr) {
+int16 map_i2c(int16 addr) {
 //	static u_lblock ps;
 //	int8 n,o;
 //	int8 *p;
@@ -48,27 +38,19 @@ int16 map_modbus(int16 addr) {
 		case 12: return (int16) current.uptime_minutes; 
 		case 13: return (int16) current.watchdog_seconds; 
 
-		/* modbus statistics */
-		case 16: return (int16) current.modbus_our_packets;
-		case 17: return (int16) current.modbus_other_packets;
-		case 18: return (int16) current.modbus_last_error;
-		/* triggers a modbus statistics reset */
-		case 19: reset_modbus_stats(); return (int16) 0;
 
 		/* configuration */
-		case 1000: return (int16) config.serial_prefix;
-		case 1001: return (int16) config.serial_number;
-		case 1002: return (int16) 'P';
-		case 1003: return (int16) 'C';
-		case 1004: return (int16) 'P';
-		case 1005: return (int16) 1;
-		case 1006: return (int16) config.modbus_address;
-		case 1007: return (int16) config.adc_sample_ticks;
-		case 1008: return (int16) config.allow_bootload_request;
-		case 1009: return (int16) config.watchdog_seconds_max;
-		case 1010: return (int16) config.pi_offtime_seconds;
-		case 1011: return (int16) config.power_startup;
-		case 1012: return (int16) config.pic_to_pi_latch_mask;
+		case 128: return (int16) config.serial_prefix;
+		case 129: return (int16) config.serial_number;
+		case 130: return (int16) 'P';
+		case 131: return (int16) 'C';
+		case 132: return (int16) 'P';
+		case 133: return (int16) 1;
+		case 134: return (int16) config.adc_sample_ticks;
+		case 135: return (int16) config.watchdog_seconds_max;
+		case 136: return (int16) config.pi_offtime_seconds;
+		case 137: return (int16) config.power_startup;
+		
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */
 		default: return (int16) 65535;
@@ -77,25 +59,7 @@ int16 map_modbus(int16 addr) {
 }
 
 
-int8 modbus_valid_read_registers(int16 start, int16 end) {
-	if ( 19999==start && 20000==end)
-		return 1;
-
-	if ( start >= MIN_CONFIG_REGISTER && end <= MAX_CONFIG_REGISTER+1 )
-		return 1;
-
-	if ( start >= MIN_EE_REGISTER && end <= MAX_EE_REGISTER+1 )
-		return 1;
-	
-
-	/* end is always start + at least one ... so no need to test for range starting at 0 */
-	if ( end <= MAX_STATUS_REGISTER+1)
-		return 1;
-
-	return 0;
-}
-
-int8 modbus_valid_write_registers(int16 start, int16 end) {
+int8 i2c_valid_write_registers(int16 start, int16 end) {
 	if ( 19999==start && 20000==end)
 		return 1;
 
@@ -115,28 +79,12 @@ int8 modbus_valid_write_registers(int16 start, int16 end) {
 	return 0;
 }
 
-void modbus_read_register_response(function func, int8 address, int16 start_address, int16 register_count ) {
-	int16 i;
-	int16 l;
-
-	modbus_serial_send_start(address, func); // FUNC_READ_HOLDING_REGISTERS);
-	modbus_serial_putc(register_count*2);
-
-
-	for( i=0 ; i<register_count ; i++ ) {
-		l=map_modbus(start_address+i);
-		modbus_serial_putc(make8(l,1));
-  		modbus_serial_putc(make8(l,0));
-	}
-
-	modbus_serial_send_stop();
-}
-
+#if 0
 /* 
 try to write the specified register
 if successful, return 0, otherwise return a modbus exception
 */
-exception modbus_write_register(int16 address, int16 value) {
+int i2c_write_register(int16 address, int16 value) {
 //	int8 n,o;
 
 	if ( address >= MIN_EE_REGISTER && address < MAX_EE_REGISTER ) {
@@ -343,3 +291,4 @@ void modbus_process(void) {
 	}
 //	output_low(TP_RED);
 }
+#endif

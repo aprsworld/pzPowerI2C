@@ -65,7 +65,7 @@ struct_time_keep timers;
 
 #include "adc_pzPowerI2C.c"
 #include "param_pzPowerI2C.c"
-
+#include "i2c_handler_pzPowerI2C.c"
 #include "interrupt_pzPowerI2C.c"
 
 void init(void) {

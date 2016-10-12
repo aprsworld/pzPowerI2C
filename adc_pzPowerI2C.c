@@ -38,5 +38,5 @@ void adc_update(void) {
 	current.adc_buffer[1][current.adc_buffer_index] = read_adc();
 
 	/* turn off the FVR */
-	setup_vref(VREF_OFF);
+//	setup_vref(VREF_OFF);
 }

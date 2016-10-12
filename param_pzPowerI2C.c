@@ -39,8 +39,6 @@ void write_default_param_file() {
 	/* red LED for 1.5 seconds */
 	timers.led_on_green=150;
 
-//	config.modbus_address=39;
-	config.modbus_address=128; /* use any address */
 
 	config.serial_prefix='P';
 	config.serial_number=9875;

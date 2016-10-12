@@ -1,10 +1,7 @@
-#include "pcPower.h"
+#include "pzPowerI2C.h"
 
 
 typedef struct {
-	int8 modbus_address;
-	int8 modbus_mode;
-
 	int8 serial_prefix;
 	int16 serial_number;
 
@@ -33,10 +30,6 @@ typedef struct {
 	int16 adc_buffer[2][16];
 	int8  adc_buffer_index;
 
-	int16 modbus_our_packets;
-	int16 modbus_other_packets;
-	int16 modbus_last_error;
-
 	int16 sequence_number;
 	int16 uptime_minutes;
 	int16 interval_milliseconds;
@@ -51,9 +44,6 @@ typedef struct {
 	int16 power_off_delay;
 	int16 power_override_timeout;
 
-	/* serial byte counters. Roll over */
-	int16 rda_bytes_received;
-
 	/* push button on board */
 	int8 latch_sw_magnet;
 } struct_current;
@@ -66,14 +56,6 @@ typedef struct {
 	int1 now_adc_reset_count;
 
 	int1 now_millisecond;
-
-
-	/* transmit buffer for PIC to PI */
-	int8 rda_tx_buff[56];
-	int8 rda_tx_length;
-	int8 rda_tx_pos;
-	int1 now_rda_tx_ready;
-	int1 now_rda_tx_done;
 } struct_time_keep;
 
 /* global structures */
@@ -81,12 +63,10 @@ struct_config config;
 struct_current current;
 struct_time_keep timers;
 
-#include "adc_pcPower.c"
-#include "param_pcPower.c"
+#include "adc_pzPowerI2C.c"
+#include "param_pzPowerI2C.c"
 
-#include "modbus_slave_pcPower.c"
-#include "modbus_handler_pcPower.c"
-#include "interrupt_pcPower.c"
+#include "interrupt_pzPowerI2C.c"
 
 void init(void) {
 	setup_oscillator(OSC_16MHZ);
@@ -106,15 +86,6 @@ void init(void) {
 	timers.now_adc_reset_count=0;
 	timers.now_millisecond=0;
 
-	timers.rda_tx_length=0;
-	timers.rda_tx_pos=0;
-	timers.now_rda_tx_ready=0;
-	timers.now_rda_tx_done=0;
-
-
-	current.modbus_our_packets=0;
-	current.modbus_other_packets=0;
-	current.modbus_last_error=0;
 	current.sequence_number=0;
 	current.uptime_minutes=0;
 	current.interval_milliseconds=0;
@@ -151,18 +122,11 @@ void periodic_millisecond(void) {
 		current.latch_sw_magnet=1;
 	}
 
-	/* set PIC to PI line based on latch state(s) */
-	if ( bit_test(config.pic_to_pi_latch_mask,0) && current.latch_sw_magnet ) {
-		output_high(PIC_TO_PI);
-	} else {
-		output_low(PIC_TO_PI);
-	}
-
 	/* green LED control */
 	if ( 0==timers.led_on_green ) {
-		output_low(LED_GREEN);
+		output_low(PIC_LED_GREEN);
 	} else {
-		output_high(LED_GREEN);
+		output_high(PIC_LED_GREEN);
 		timers.led_on_green--;
 	}
 
@@ -237,8 +201,8 @@ void main(void) {
 
 //	output_high(PI_POWER_EN);
 
-#if 0
-	for ( j=0 ; j<100 ; j++ ) {
+#if 1
+	for ( i=0 ; i<100 ; i++ ) {
 		output_high(PIC_LED_GREEN);
 		delay_ms(50);
 		output_low(PIC_LED_GREEN);
@@ -268,16 +232,13 @@ void main(void) {
 
 
 
-	if ( config.modbus_address > 128 ) {
+//	if ( config.modbus_address > 128 ) {
 		write_default_param_file();
-	}
+//	}
 
 	timers.led_on_green=500;
 
-	/* start Modbus slave */
-	setup_uart(TRUE);
-	/* modbus_init turns on global interrupts */
-	modbus_init();
+	enable_interrupts(GLOBAL);
 
 	/* Prime ADC filter */
 	for ( i=0 ; i<30 ; i++ ) {
@@ -288,7 +249,7 @@ void main(void) {
 	current.p_on=config.power_startup;
 
 
-	fprintf(STREAM_PI,"# pcPower %s config.modbus_address=%u\r\n",__DATE__,config.modbus_address);
+	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
 
 	for ( ; ; ) {
 		restart_wdt();
@@ -305,31 +266,7 @@ void main(void) {
 			adc_update();
 		}
 
-		modbus_process();
 
-		/* buffered modbus transmit */
-
-		/* start transmitting */
-		if ( timers.now_rda_tx_ready ) {
-			timers.now_rda_tx_ready=0;
-
-			RCV_OFF();
-
-			/* 3.5 character delay (3500000/baud) */
-			delay_us(61); /* 57600 */
-
-			/* enable transmit buffer empty interrupt. It will feed itself */
-			enable_interrupts(INT_TBE);
-		}
-
-		/* done transmitting */
-		if ( timers.now_rda_tx_done ) {
-			timers.now_rda_tx_done=0;
-
-			/* 3.5 character delay (3500000/baud) */
-			delay_us(61); /* 57600 */
-   			RCV_ON();
-		}
 	}
 
 

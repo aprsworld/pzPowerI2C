@@ -30,3 +30,8 @@ Example command:
 `mbusd -d -y /sys/class/gpio/gpio4/value -p /dev/ttyAMA0 -s 9600`
 
 The `-y filename` option is used to specify the name of the file that should have a `1` written to it when the RS-485 should transmit and a `0` written to it when it should not transmit. Although it not used with this board, we have added a `-Y` flag that is the inverse of this.
+
+Before the GPIO can be used for direction control, it must be exported and set to an output using the sysfs interface.
+
+`echo 4 > /sys/class/gpio/export`
+`echo out > /sys/class/gpio/gpio4/direction`

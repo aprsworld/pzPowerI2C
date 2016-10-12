@@ -27,29 +27,28 @@ int16 map_i2c(int16 addr) {
 		case  2: return (int16) current.adc_buffer[1][current.adc_buffer_index];
 		case  3: return (int16) adc_get(1);
 
-
 		/* switch channels */
-		case  6: return (int16) ! input(SW_MAGNET);
-		case  7: return (int16) current.latch_sw_magnet;
+		case  4: return (int16) ! input(SW_MAGNET);
+		case  5: return (int16) current.latch_sw_magnet;
 		
 		/* status */
-		case 10: return (int16) current.sequence_number++;
-		case 11: return (int16) current.interval_milliseconds; /* milliseconds since last query */
-		case 12: return (int16) current.uptime_minutes; 
-		case 13: return (int16) current.watchdog_seconds; 
+		case  6: return (int16) current.sequence_number++;
+		case  7: return (int16) current.interval_milliseconds; /* milliseconds since last query */
+		case  8: return (int16) current.uptime_minutes; 
+		case  9: return (int16) current.watchdog_seconds; 
 
 
 		/* configuration */
-		case 128: return (int16) config.serial_prefix;
-		case 129: return (int16) config.serial_number;
-		case 130: return (int16) 'P';
-		case 131: return (int16) 'C';
-		case 132: return (int16) 'P';
-		case 133: return (int16) 1;
-		case 134: return (int16) config.adc_sample_ticks;
-		case 135: return (int16) config.watchdog_seconds_max;
-		case 136: return (int16) config.pi_offtime_seconds;
-		case 137: return (int16) config.power_startup;
+		case 32: return (int16) config.serial_prefix;
+		case 33: return (int16) config.serial_number;
+		case 34: return (int16) 'P';
+		case 35: return (int16) 'Z';
+		case 36: return (int16) 'P';
+		case 37: return (int16) 3;
+		case 38: return (int16) config.adc_sample_ticks;
+		case 39: return (int16) config.watchdog_seconds_max;
+		case 40: return (int16) config.pi_offtime_seconds;
+		case 41: return (int16) config.power_startup;
 		
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */

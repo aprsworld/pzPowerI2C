@@ -13,9 +13,9 @@ Pin | Function | Note
 ---|---|---
 1|Ethernet TD+ / Power+|
 2|Ethernet TD- / Power+|
-3|Ethernet RD+ / Power-| To MOXA pin 5 for RS-485
-4|RS485 B|To MOXA pin 4 for RS-485
-5|RS485 A|To Moxa pin 3 for RS-485
+3|Ethernet RD+ / Power-| To MOXA pin 5 for RS-485 / To XRW2G P2.3
+4|RS485 B|To MOXA pin 4 for RS-485 / To XRW2G P2.2
+5|RS485 A|To Moxa pin 3 for RS-485 / To XRW2G P2.1
 6|Ethernet RD- / Power-|
 7|Unused|Brought to P6.1 near board edge
 8|Unused|Brought to P6.2 near board edge
@@ -33,5 +33,7 @@ The `-y filename` option is used to specify the name of the file that should hav
 
 Before the GPIO can be used for direction control, it must be exported and set to an output using the sysfs interface.
 
-`echo 4 > /sys/class/gpio/export`
-`echo out > /sys/class/gpio/gpio4/direction`
+```
+echo 4 > /sys/class/gpio/export
+echo out > /sys/class/gpio/gpio4/direction
+```

@@ -276,7 +276,7 @@ void main(void) {
 		if ( timers.now_adc_sample ) {
 			timers.now_adc_sample=0;
 			adc_update();
-			sprintf(buffer,">i=%lu,r=%lu<",adc_get(0),adc_get(1));
+//			sprintf(buffer,">i=%lu,r=%lu<",adc_get(0),adc_get(1));
 		}
 
 

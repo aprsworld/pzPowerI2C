@@ -9,13 +9,6 @@ unsigned int8 address, buffer[16];
 void ssp_interrupt () {
 	unsigned int8 incoming, state;
 
-	timers.led_on_green=1000;
-
-//	SSP1IF=0;
-//	PIR1=0;
-
-//	output_high(PI_POWER_EN);
-
 	state = i2c_isr_state();
 
 	if(state <= 0x80) {                      //Master is sending data
@@ -34,5 +27,4 @@ void ssp_interrupt () {
 		i2c_write(buffer[address++]);
 	}
 
-//	clear_interrupt(INT_SSP);
 }

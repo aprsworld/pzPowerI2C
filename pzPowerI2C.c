@@ -72,8 +72,8 @@ void init(void) {
 	setup_oscillator(OSC_16MHZ);
 
 	setup_adc(ADC_CLOCK_DIV_16);
-	setup_adc_ports(sAN4,VSS_VREF);
-	setup_vref(VREF_4v096); 
+	setup_adc_ports(sAN4,VSS_VDD);
+
 
 	set_tris_a(0b00101011);
 	set_tris_b(0b01110000);
@@ -82,7 +82,6 @@ void init(void) {
 
 	port_a_pullups(0b00101011);
 	port_b_pullups(0b00000000);
-//	port_c_pullups(0b00000000);
 //                   76543210
 
 	/* data structure initialization */
@@ -262,7 +261,7 @@ void main(void) {
 
 //		output_bit(PIC_LED_GREEN,input(SW_MAGNET));
 
-		if ( ! input(SW_MAGNET) ) {
+		if ( '1' == buffer[0] ) {
 			timers.led_on_green=100;
 		} else {
 			timers.led_on_green=0;
@@ -277,6 +276,7 @@ void main(void) {
 		if ( timers.now_adc_sample ) {
 			timers.now_adc_sample=0;
 			adc_update();
+			sprintf(buffer,">i=%lu,r=%lu<",adc_get(0),adc_get(1));
 		}
 
 

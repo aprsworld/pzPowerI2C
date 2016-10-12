@@ -28,11 +28,15 @@ void adc_update(void) {
 	if ( current.adc_buffer_index >= 16 )
 		current.adc_buffer_index=0;
 
+	/* turn on the FVR */
+	setup_vref(VREF_1v024); 
+
 	set_adc_channel(4);
 	current.adc_buffer[0][current.adc_buffer_index] = read_adc();
 
 	set_adc_channel(FVR_CHANNEL);
 	current.adc_buffer[1][current.adc_buffer_index] = read_adc();
 
-
+	/* turn off the FVR */
+	setup_vref(VREF_OFF);
 }

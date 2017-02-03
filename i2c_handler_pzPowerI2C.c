@@ -8,14 +8,18 @@
 
 
 
-int16 map_i2c(int16 addr) {
+int16 map_i2c(int8 addr) {
 //	static u_lblock ps;
 //	int8 n,o;
 //	int8 *p;
 
+//	return (int16) addr;
+
+#if 0
 	if ( addr >= MIN_EE_REGISTER && addr < MAX_EE_REGISTER ) {
 		return (int16) read_eeprom(addr - MIN_EE_REGISTER + EE_FOR_HOST_ADDRESS);
 	}
+#endif
 
 
 	switch ( addr ) {
@@ -52,7 +56,7 @@ int16 map_i2c(int16 addr) {
 		
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */
-		default: return (int16) 65535;
+		default: return (int16) addr;
 	}
 
 }

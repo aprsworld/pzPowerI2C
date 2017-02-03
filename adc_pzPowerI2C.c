@@ -34,7 +34,9 @@ void adc_update(void) {
 	set_adc_channel(4);
 	current.adc_buffer[0][current.adc_buffer_index] = read_adc();
 
+
 	set_adc_channel(FVR_CHANNEL);
+	delay_ms(1);
 	current.adc_buffer[1][current.adc_buffer_index] = read_adc();
 
 	/* turn off the FVR */

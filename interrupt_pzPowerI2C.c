@@ -26,9 +26,9 @@ void ssp_interrupt () {
 	}
 
 	if(state >= 0x80) {                     //Master is requesting data
-		if ( 0 == address%2 ) {
+		if ( ! bit_test(address,0) ) {
 			/* read 16 bit register on even address */
-			lastValue=map_i2c(address);
+			lastValue=map_i2c(address>>1);
 			i2c_write(make8(lastValue,1));
 		} else {
 			/* send other byte of 16 bit register on odd address */

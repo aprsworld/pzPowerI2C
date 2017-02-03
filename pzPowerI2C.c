@@ -72,10 +72,10 @@ void init(void) {
 	setup_oscillator(OSC_16MHZ);
 
 	setup_adc(ADC_CLOCK_DIV_16);
-	setup_adc_ports(sAN4,VSS_VDD);
+	setup_adc_ports(sAN2 | sAN4,VSS_VDD);
 
 
-	set_tris_a(0b00101011);
+	set_tris_a(0b00101111);
 	set_tris_b(0b01110000);
 	set_tris_c(0b00000001);
 //               76543210
@@ -161,8 +161,10 @@ void periodic_millisecond(void) {
 		/* control power to the raspberrry pi load */
 		if ( 0==timers.load_off_seconds ) {
 			output_high(PI_POWER_EN);
+			output_high(WIFI_POWER_EN);
 		} else {
 			output_low(PI_POWER_EN);
+			output_low(WIFI_POWER_EN);
 			timers.load_off_seconds--;
 
 			if ( 0 == timers.load_off_seconds ) {
@@ -205,6 +207,7 @@ void main(void) {
 	init();
 
 	output_low(PI_POWER_EN);
+	output_low(WIFI_POWER_EN);
 
 	strcpy(buffer,"hello, world!");
 //                 0123456789012345

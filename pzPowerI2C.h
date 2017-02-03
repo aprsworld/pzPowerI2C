@@ -30,10 +30,12 @@
 #use rs232(UART1,stream=STREAM_PI,baud=9600,errors)	
 
 #define PI_POWER_EN          PIN_C4
+#define WIFI_POWER_EN        PIN_C5
 #define PIC_LED_GREEN        PIN_C6
 #define SER_FROM_PI          PIN_B5
 #define SW_MAGNET            PIN_A5
 #define AN_IN_VOLTS          PIN_C0
+#define AN_VTEMP             PIN_A2
 #define I2C_SDA              PIN_B4
 #define I2C_SCL              PIN_B6
 

@@ -37,3 +37,27 @@ Before the GPIO can be used for direction control, it must be exported and set t
 echo 4 > /sys/class/gpio/export
 echo out > /sys/class/gpio/gpio4/direction
 ```
+
+Here is a script that does all that
+```
+#!/bin/bash
+GPIO_N="4"
+
+echo "# using GPIO$GPIO_N for RTS485 transmit enable"
+
+if [ ! -e /sys/class/gpio/gpio$GPIO_N/direction ]; then
+	echo "# exporting GPIO$GPIO_N for sysfs control"
+	echo $GPIO_N > /sys/class/gpio/export
+fi
+
+echo "# setting GPIO$GPIO_N to be output"
+echo out > /sys/class/gpio/gpio4/direction
+
+echo "# starting mbusd in foreground"
+mbusd -d -y /sys/class/gpio/gpio4/value -p /dev/ttyAMA0 -s 9600 -v 9 -W100 -T0
+
+if [ -e /sys/class/gpio/gpio$GPIO_N/direction ]; then
+	echo "# un-exporting GPIO$GPIO_N from sysfs control"
+	echo $GPIO_N > /sys/class/gpio/unexport
+fi
+```

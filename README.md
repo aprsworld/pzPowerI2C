@@ -50,6 +50,9 @@ if [ ! -e /sys/class/gpio/gpio$GPIO_N/direction ]; then
 	echo $GPIO_N > /sys/class/gpio/export
 fi
 
+# give system a chance to export the gpio and make direction available
+sleep 0.1
+
 echo "# setting GPIO$GPIO_N to be output"
 echo out > /sys/class/gpio/gpio4/direction
 

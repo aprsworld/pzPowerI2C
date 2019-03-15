@@ -7,7 +7,16 @@ The pzPowerI2C micro controller is connected to the Raspberry Pi with a I2C inte
 
 ## Hardware Notes
 
-### RJ-45 connector
+### 5 position screw terminal (present on WiFi variant)
+
+Pin | Function | Note
+1|POWER|7 to 36 volts DC
+2|COM|Common with power and RS-485
+3|RS485 A|
+4|RS485 B|
+5|COM|Common with power and RS-485
+
+### RJ-45 connector (present only on ethernet variant, I guess)
 
 Pin | Function | Note
 ---|---|---

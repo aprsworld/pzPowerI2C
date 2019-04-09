@@ -72,6 +72,7 @@ void init(void) {
 	setup_oscillator(OSC_16MHZ);
 
 	setup_adc(ADC_CLOCK_DIV_16);
+	/* NTC thermistor on sAN2 and input voltage divider on sAN4, voltage spans between 0 and Vdd */
 	setup_adc_ports(sAN2 | sAN4,VSS_VDD);
 
 
@@ -109,8 +110,6 @@ void init(void) {
 	setup_timer_2(T2_DIV_BY_16,249,1);
 
 	enable_interrupts(INT_TIMER2);
-
-	/* RDA - PI is turned on in modbus_slave_pcwx's init */
 }
 
 
@@ -218,31 +217,8 @@ void main(void) {
 		delay_ms(200);
 	}
 
-	strcpy(buffer,"hello, world!");
-//                 0123456789012345
-
-#if 0
-	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
-	fprintf(STREAM_PI,"# restart_cause()=%u ",i);
-
-	switch ( i ) {
-		case WDT_TIMEOUT: fprintf(STREAM_PI,"WDT_TIMEOUT"); break;
-		case MCLR_FROM_SLEEP: fprintf(STREAM_PI,"MCLR_FROM_SLEEP"); break;
-		case MCLR_FROM_RUN: fprintf(STREAM_PI,"MCLR_FROM_RUN"); break;
-		case NORMAL_POWER_UP: fprintf(STREAM_PI,"NORMAL_POWER_UP"); break;
-		case BROWNOUT_RESTART: fprintf(STREAM_PI,"BROWNOUT_RESTART"); break;
-		case WDT_FROM_SLEEP: fprintf(STREAM_PI,"WDT_FROM_SLEEP"); break;
-		case RESET_INSTRUCTION: fprintf(STREAM_PI,"RESET_INSTRUCTION"); break;
-		default: fprintf(STREAM_PI,"unknown!");
-	}
-	fprintf(STREAM_PI,"\r\n");
-#endif
-
 
 	read_param_file();
-
-	/* 100 minutes before power cycle */
-	config.watchdog_seconds_max=6030;
 
 
 
@@ -263,23 +239,13 @@ void main(void) {
 	current.p_on=config.power_startup;
 
 
-	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
+//	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
 
 	/* enable I2C slave interrupt */
 	enable_interrupts(INT_SSP);
 
 	for ( ; ; ) {
 		restart_wdt();
-
-//		output_bit(PIC_LED_GREEN,input(SW_MAGNET));
-
-#if 0
-		if ( '1' == buffer[0] ) {
-			timers.led_on_green=100;
-		} else {
-			timers.led_on_green=0;
-		}
-#endif
 
 		if ( timers.now_millisecond ) {
 			periodic_millisecond();

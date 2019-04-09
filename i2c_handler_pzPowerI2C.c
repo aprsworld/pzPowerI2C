@@ -8,7 +8,7 @@
 
 
 
-int16 _map_i2c(int8 addr) {
+int16 map_i2c(int8 addr) {
 
 	timers.led_on_green=100;
 
@@ -18,23 +18,13 @@ int16 _map_i2c(int8 addr) {
 
 //	return (int16) addr;
 
-#if 0
-	if ( addr >= MIN_EE_REGISTER && addr < MAX_EE_REGISTER ) {
-		return (int16) read_eeprom(addr - MIN_EE_REGISTER + EE_FOR_HOST_ADDRESS);
-	}
-#endif
-
-	if ( addr >= 100 && addr < 100+sizeof(buffer) ) {
-		return buffer[address];
-	}
-
 
 	switch ( addr ) {
 		/* analog channels */
 		/* input voltage */
 		case  0: return (int16) current.adc_buffer[0][current.adc_buffer_index];
 		case  1: return (int16) adc_get(0);
-		/* fixed 1.024 volt reference */
+		/* temperature sensor */
 		case  2: return (int16) current.adc_buffer[1][current.adc_buffer_index];
 		case  3: return (int16) adc_get(1);
 

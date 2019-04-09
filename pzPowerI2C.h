@@ -1,5 +1,5 @@
 #include <18F14K22.h>
-#device ADC=12
+#device ADC=10
 #device *=16
 #use delay(clock=16MHz)
 #use i2c(SLAVE, I2C1, address=0x34, FORCE_HW)
@@ -28,7 +28,7 @@
 
 #use standard_io(ALL)
 
-#use rs232(UART1,stream=STREAM_PI,baud=9600,errors)	
+//#use rs232(UART1,stream=STREAM_PI,baud=9600,errors)	
 
 #define PI_POWER_EN          PIN_C4
 #define WIFI_POWER_EN        PIN_C5

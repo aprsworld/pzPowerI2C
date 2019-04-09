@@ -3,13 +3,14 @@ void isr_timer2() {
 	timers.now_millisecond=1;
 }
 
-unsigned int8 address, buffer[16];
+unsigned int8 address;
 
 #INT_SSP
 void ssp_interrupt () {
 	unsigned int8 incoming, state;
 
 	static int16 lastValue;
+
 
 	state = i2c_isr_state();
 
@@ -22,8 +23,11 @@ void ssp_interrupt () {
 		if(state == 1)                      //First received byte is address
 			address = incoming;
 		else if(state >= 2 && state != 0x80)   //Received byte is data
-			buffer[address++] = incoming;
+			// stub to do nothing for now
+			incoming = incoming;
+			// buffer[address++] = incoming;
 	}
+
 
 	if(state >= 0x80) {                     //Master is requesting data
 		if ( ! bit_test(address,0) ) {

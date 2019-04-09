@@ -7,7 +7,17 @@ The pzPowerI2C micro controller is connected to the Raspberry Pi with a I2C inte
 
 ## Hardware Notes
 
-### RJ-45 connector
+### 5 position screw terminal (present on WiFi variant)
+
+Pin | Function | Note
+---|---|---
+1|POWER|7 to 36 volts DC
+2|COM|Common with power and RS-485
+3|RS485 A|
+4|RS485 B|
+5|COM|Common with power and RS-485
+
+### RJ-45 connector (present only on ethernet variant, I guess)
 
 Pin | Function | Note
 ---|---|---
@@ -36,4 +46,31 @@ Before the GPIO can be used for direction control, it must be exported and set t
 ```
 echo 4 > /sys/class/gpio/export
 echo out > /sys/class/gpio/gpio4/direction
+```
+
+Here is a script that does all that
+```
+#!/bin/bash
+GPIO_N="4"
+
+echo "# using GPIO$GPIO_N for RTS485 transmit enable"
+
+if [ ! -e /sys/class/gpio/gpio$GPIO_N/direction ]; then
+	echo "# exporting GPIO$GPIO_N for sysfs control"
+	echo $GPIO_N > /sys/class/gpio/export
+fi
+
+# give system a chance to export the gpio and make direction available
+sleep 0.1
+
+echo "# setting GPIO$GPIO_N to be output"
+echo out > /sys/class/gpio/gpio4/direction
+
+echo "# starting mbusd in foreground"
+mbusd -d -y /sys/class/gpio/gpio4/value -p /dev/ttyAMA0 -s 9600 -v 9 -W100 -T0
+
+if [ -e /sys/class/gpio/gpio$GPIO_N/direction ]; then
+	echo "# un-exporting GPIO$GPIO_N from sysfs control"
+	echo $GPIO_N > /sys/class/gpio/unexport
+fi
 ```

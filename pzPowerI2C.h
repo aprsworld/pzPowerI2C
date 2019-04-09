@@ -28,7 +28,7 @@
 
 #use standard_io(ALL)
 
-//#use rs232(UART1,stream=STREAM_PI,baud=9600,errors)	
+#use rs232(UART1,stream=STREAM_PI,baud=9600,errors)	
 
 #define PI_POWER_EN          PIN_C4
 #define WIFI_POWER_EN        PIN_C5

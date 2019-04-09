@@ -239,7 +239,7 @@ void main(void) {
 	current.p_on=config.power_startup;
 
 
-//	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
+	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
 
 	/* enable I2C slave interrupt */
 	enable_interrupts(INT_SSP);

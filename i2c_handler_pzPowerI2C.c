@@ -40,7 +40,7 @@ int16 map_i2c(int8 addr) {
 
 
 		/* configuration */
-		case 32: return (int16) config.serial_prefix;
+		case 32: return (int16) 0x1234; // config.serial_prefix;
 		case 33: return (int16) config.serial_number;
 		case 34: return (int16) 'P';
 		case 35: return (int16) 'Z';

@@ -8,7 +8,10 @@
 
 
 
-int16 map_i2c(int8 addr) {
+int16 _map_i2c(int8 addr) {
+
+	timers.led_on_green=100;
+
 //	static u_lblock ps;
 //	int8 n,o;
 //	int8 *p;
@@ -20,6 +23,10 @@ int16 map_i2c(int8 addr) {
 		return (int16) read_eeprom(addr - MIN_EE_REGISTER + EE_FOR_HOST_ADDRESS);
 	}
 #endif
+
+	if ( addr >= 100 && addr < 100+sizeof(buffer) ) {
+		return buffer[address];
+	}
 
 
 	switch ( addr ) {
@@ -54,6 +61,8 @@ int16 map_i2c(int8 addr) {
 		case 40: return (int16) config.pi_offtime_seconds;
 		case 41: return (int16) config.power_startup;
 		
+
+
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */
 		default: return (int16) addr;

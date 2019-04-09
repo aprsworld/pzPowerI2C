@@ -163,8 +163,8 @@ void periodic_millisecond(void) {
 			output_high(PI_POWER_EN);
 			output_high(WIFI_POWER_EN);
 		} else {
-			output_low(PI_POWER_EN);
-			output_low(WIFI_POWER_EN);
+//			output_low(PI_POWER_EN);
+//			output_low(WIFI_POWER_EN);
 			timers.load_off_seconds--;
 
 			if ( 0 == timers.load_off_seconds ) {
@@ -208,6 +208,15 @@ void main(void) {
 
 	output_low(PI_POWER_EN);
 	output_low(WIFI_POWER_EN);
+
+	/* flash on startup */
+	for ( i=0 ; i<5 ; i++ ) {
+		restart_wdt();
+		output_high(PIC_LED_GREEN);
+		delay_ms(200);
+		output_low(PIC_LED_GREEN);
+		delay_ms(200);
+	}
 
 	strcpy(buffer,"hello, world!");
 //                 0123456789012345
@@ -264,12 +273,13 @@ void main(void) {
 
 //		output_bit(PIC_LED_GREEN,input(SW_MAGNET));
 
+#if 0
 		if ( '1' == buffer[0] ) {
 			timers.led_on_green=100;
 		} else {
 			timers.led_on_green=0;
 		}
-
+#endif
 
 		if ( timers.now_millisecond ) {
 			periodic_millisecond();

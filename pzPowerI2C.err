@@ -1,0 +1,5 @@
+*** Error 12 "C:\Users\James Jarvis\Desktop\planetPrecision\pzPowerI2C\i2c_handler_pzPowerI2C.c" Line 27(39,45): Undefined identifier   buffer
+*** Error 12 "C:\Users\James Jarvis\Desktop\planetPrecision\pzPowerI2C\i2c_handler_pzPowerI2C.c" Line 28(8,14): Undefined identifier   buffer
+*** Error 12 "C:\Users\James Jarvis\Desktop\planetPrecision\pzPowerI2C\interrupt_pzPowerI2C.c" Line 31(18,19): Undefined identifier  -- map_i2c
+      3 Errors,  0 Warnings.
+Build Failed.

@@ -2,7 +2,8 @@
 #device ADC=12
 #device *=16
 #use delay(clock=16MHz)
-#use i2c(SLAVE, I2C1, address=0xA0, FORCE_HW)
+#use i2c(SLAVE, I2C1, address=0x34, FORCE_HW)
+/* Linux / i2cdetect will use the CCS address >>1. So 0x34 becomes 0x1a */
 
 #fuses INTRC_IO
 #fuses NOPLLEN

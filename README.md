@@ -34,7 +34,7 @@ Pin | Function | Note
 The board has an RS-485 port that is connected to the UART on the Pi. Half duplex (2-wire) RS-485 requires a transmit enable signal. GPIO 4 is used for this. The software communicating on the RS-485 must have direction control support capable of toggling this GPIO.
 
 We have added support to mbusd for direction control using the linux sysfs interface. An example script for setting up direction control pin and starting
-mbusd can be found in the support directory.
+mbusd can be found in the [support](support/) directory.
 
 Note that different Pi variants have different serial port names. `/dev/ttyAMA0` was traditionally the Pi's external serial port. But on Bluetooth enabled
 Pi's, the external serial port usually becomes `/dev/ttyS0`

@@ -51,7 +51,7 @@ int16 map_i2c(int8 addr) {
 		case 40: return (int16) config.pi_offtime_seconds;
 		case 41: return (int16) config.power_startup;
 		
-
+		/* test message */
 
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */

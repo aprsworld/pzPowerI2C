@@ -33,44 +33,9 @@ Pin | Function | Note
 ### RS-485 port
 The board has an RS-485 port that is connected to the UART on the Pi. Half duplex (2-wire) RS-485 requires a transmit enable signal. GPIO 4 is used for this. The software communicating on the RS-485 must have direction control support capable of toggling this GPIO.
 
-We have added support to mbusd for direction control using the linux sysfs interface.
+We have added support to mbusd for direction control using the linux sysfs interface. An example script for setting up direction control pin and starting
+mbusd can be found in the [support](support/) directory.
 
-Example command:
+Note that different Pi variants have different serial port names. `/dev/ttyAMA0` was traditionally the Pi's external serial port. But on Bluetooth enabled
+Pi's, the external serial port usually becomes `/dev/ttyS0`
 
-`mbusd -d -y /sys/class/gpio/gpio4/value -p /dev/ttyAMA0 -s 9600`
-
-The `-y filename` option is used to specify the name of the file that should have a `1` written to it when the RS-485 should transmit and a `0` written to it when it should not transmit. Although it not used with this board, we have added a `-Y` flag that is the inverse of this.
-
-Before the GPIO can be used for direction control, it must be exported and set to an output using the sysfs interface.
-
-```
-echo 4 > /sys/class/gpio/export
-echo out > /sys/class/gpio/gpio4/direction
-```
-
-Here is a script that does all that
-```
-#!/bin/bash
-GPIO_N="4"
-
-echo "# using GPIO$GPIO_N for RTS485 transmit enable"
-
-if [ ! -e /sys/class/gpio/gpio$GPIO_N/direction ]; then
-	echo "# exporting GPIO$GPIO_N for sysfs control"
-	echo $GPIO_N > /sys/class/gpio/export
-fi
-
-# give system a chance to export the gpio and make direction available
-sleep 0.1
-
-echo "# setting GPIO$GPIO_N to be output"
-echo out > /sys/class/gpio/gpio4/direction
-
-echo "# starting mbusd in foreground"
-mbusd -d -y /sys/class/gpio/gpio4/value -p /dev/ttyAMA0 -s 9600 -v 9 -W100 -T0
-
-if [ -e /sys/class/gpio/gpio$GPIO_N/direction ]; then
-	echo "# un-exporting GPIO$GPIO_N from sysfs control"
-	echo $GPIO_N > /sys/class/gpio/unexport
-fi
-```

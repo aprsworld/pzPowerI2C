@@ -1,0 +1,24 @@
+#!/bin/bash
+GPIO_N="4"
+DEVICE=/dev/ttyS0
+
+echo "# using GPIO$GPIO_N for RTS485 transmit enable"
+
+if [ ! -e /sys/class/gpio/gpio$GPIO_N/direction ]; then
+	echo "# exporting GPIO$GPIO_N for sysfs control"
+	echo $GPIO_N > /sys/class/gpio/export
+fi
+
+# give system a chance to export the gpio and make direction available
+sleep 0.1
+
+echo "# setting GPIO$GPIO_N to be output"
+echo out > /sys/class/gpio/gpio4/direction
+
+echo "# starting mbusd in foreground"
+mbusd -d -y /sys/class/gpio/gpio4/value -p $DEVICE -s 9600 -v 9 -W100 -T0 -L-
+
+if [ -e /sys/class/gpio/gpio$GPIO_N/direction ]; then
+	echo "# un-exporting GPIO$GPIO_N from sysfs control"
+	echo $GPIO_N > /sys/class/gpio/unexport
+fi

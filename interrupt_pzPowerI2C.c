@@ -36,19 +36,15 @@ void ssp_interrupt () {
 				lastMSB=incoming;
 			} else if ( 3 == state ) {
 				/* 16 bit value made of previous byte and this byte */
-				config.serial_number=make16(lastMSB,incoming);
+				write_i2c(address,make16(lastMSB,incoming));
 			}
 
 
 			/* reset write watchdog */
 			current.write_watchdog_seconds=0;
 			
-			if ( 5 == address ) {
-				/* stub - reset magnetic switch latch */
-				current.latch_sw_magnet=0;
-			}
 
-			address++;
+//			address++;
 		}
 	}
 

@@ -6,7 +6,21 @@
 #define MIN_EE_REGISTER              2000
 #define MAX_EE_REGISTER              MIN_EE_REGISTER + 512
 
+void write_i2c(int8 address, int16 value) {
+	switch ( address ) {
+		case  5: 
+				current.latch_sw_magnet=0;
+				break;
+		case 32: 
+				if ( value >= 'A' && value <='Z' ) 
+					config.serial_prefix=value;
+				break;
+		case 33:
+				config.serial_number=value;
+				break;
+	}
 
+}
 
 int16 map_i2c(int8 addr) {
 

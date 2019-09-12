@@ -36,7 +36,8 @@ int16 map_i2c(int8 addr) {
 		case  6: return (int16) current.sequence_number++;
 		case  7: return (int16) current.interval_milliseconds; /* milliseconds since last query */
 		case  8: return (int16) current.uptime_minutes; 
-		case  9: return (int16) current.watchdog_seconds; 
+		case  9: return (int16) current.read_watchdog_seconds; 
+		case 10: return (int16) current.write_watchdog_seconds;
 
 
 		/* configuration */
@@ -51,8 +52,6 @@ int16 map_i2c(int8 addr) {
 		case 40: return (int16) config.pi_offtime_seconds;
 		case 41: return (int16) config.power_startup;
 		
-		/* test message */
-
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */
 		default: return (int16) addr;

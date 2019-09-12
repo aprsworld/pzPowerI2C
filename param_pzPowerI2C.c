@@ -41,7 +41,7 @@ void write_default_param_file() {
 
 
 	config.serial_prefix='P';
-	config.serial_number=9875;
+	config.serial_number=9873;
 
 	config.adc_sample_ticks=20;
 	config.allow_bootload_request=0;

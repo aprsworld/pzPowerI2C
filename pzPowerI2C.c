@@ -36,7 +36,8 @@ typedef struct {
 
 	int8 factory_unlocked;
 
-	int16 watchdog_seconds;
+	int16 read_watchdog_seconds;
+	int16 write_watchdog_seconds;
 
 	/* power control switch */
 	int8 p_on;
@@ -44,7 +45,7 @@ typedef struct {
 	int16 power_off_delay;
 	int16 power_override_timeout;
 
-	/* push button on board */
+	/* magnet sensor on board */
 	int8 latch_sw_magnet;
 } struct_current;
 
@@ -97,7 +98,8 @@ void init(void) {
 	current.interval_milliseconds=0;
 	current.adc_buffer_index=0;
 	current.factory_unlocked=0;
-	current.watchdog_seconds=0;
+	current.read_watchdog_seconds=0;
+	current.write_watchdog_seconds=0;
 	current.latch_sw_magnet=0;
 
 	/* power control switch */
@@ -146,16 +148,21 @@ void periodic_millisecond(void) {
 		ticks=0;
 
 		/* watchdog power control of pi */
-		if ( current.watchdog_seconds != 65535 ) {
-			current.watchdog_seconds++;
+		if ( current.read_watchdog_seconds != 65535 ) {
+			current.read_watchdog_seconds++;
+		}
+		if ( current.write_watchdog_seconds != 65535 ) {
+			current.write_watchdog_seconds++;
 		}
 
+#if 0
 		/* shut off when:
 			a) watchdog_seconds_max != 0 AND watchdog_seconds is greater than watchdog_seconds_max AND it isn't already off 
 		*/
 		if ( 0 != config.watchdog_seconds_max && current.watchdog_seconds > config.watchdog_seconds_max && 0 == timers.load_off_seconds ) {
 			timers.load_off_seconds=config.pi_offtime_seconds;
 		}
+#endif
 
 		/* control power to the raspberrry pi load */
 		if ( 0==timers.load_off_seconds ) {
@@ -168,7 +175,7 @@ void periodic_millisecond(void) {
 
 			if ( 0 == timers.load_off_seconds ) {
 				/* reset watchdog seconds so we can turn back on */
-				current.watchdog_seconds=0;
+				current.read_watchdog_seconds=0;
 			}
 		}
 

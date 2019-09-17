@@ -7,20 +7,12 @@ typedef struct {
 
 	int16 adc_sample_ticks;
 
-	int8 allow_bootload_request;
-	int16 watchdog_seconds_max;
-	int16 pi_offtime_seconds;
-
 
 	/* power control switch settings */
 	int8 power_startup; /* 0==start with PI off, 1==start with PI on */
-	int16 power_off_below_adc;
-	int16 power_off_below_delay;
-	int16 power_on_above_adc;
-	int16 power_on_above_delay;
-	int16 power_override_timeout;
 
-	int8 pic_to_pi_latch_mask;
+
+//	int8 pic_to_pi_latch_mask;
 } struct_config;
 
 
@@ -57,6 +49,10 @@ typedef struct {
 	int1 now_adc_reset_count;
 
 	int1 now_millisecond;
+
+	int1 now_write_config;
+	int1 now_reset_config;
+	int1 now_factory_unlock;
 } struct_time_keep;
 
 /* global structures */
@@ -92,6 +88,10 @@ void init(void) {
 	timers.now_adc_sample=0;
 	timers.now_adc_reset_count=0;
 	timers.now_millisecond=0;
+	timers.now_write_config=0;
+	timers.now_reset_config=0;
+	timers.now_factory_unlock=0;
+
 
 	current.sequence_number=0;
 	current.uptime_minutes=0;
@@ -102,10 +102,6 @@ void init(void) {
 	current.write_watchdog_seconds=0;
 	current.latch_sw_magnet=0;
 
-	/* power control switch */
-	current.power_on_delay=config.power_on_above_delay;
-	current.power_off_delay=config.power_off_below_delay;
-	current.power_override_timeout=0;
 
 	/* one periodic interrupt @ 1mS. Generated from system 16 MHz clock */
 	/* prescale=16, match=249, postscale=1. Match is 249 because when match occurs, one cycle is lost */
@@ -263,6 +259,15 @@ void main(void) {
 			timers.now_adc_sample=0;
 			adc_update();
 //			sprintf(buffer,">i=%lu,r=%lu<",adc_get(0),adc_get(1));
+		}
+
+		if ( timers.now_write_config ) {
+			timers.now_write_config=0;
+			write_param_file();
+		}
+		if ( timers.now_reset_config ) {
+			timers.now_write_config=0;
+			write_default_param_file();
 		}
 
 

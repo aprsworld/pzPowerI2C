@@ -44,12 +44,9 @@ void write_default_param_file() {
 	config.serial_number=9873;
 
 	config.adc_sample_ticks=20;
-	config.allow_bootload_request=0;
 
-	config.watchdog_seconds_max=6030; /* 10 minutes & 30 seconds */
-	config.pi_offtime_seconds=2;
+
 	config.power_startup=0;
-	config.pic_to_pi_latch_mask=1; 
 
 	/* write them so next time we use from EEPROM */
 //	write_param_file();

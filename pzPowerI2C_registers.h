@@ -1,3 +1,5 @@
+/* this register map header originates from pzPowerI2C GIT repository */
+
 #define PZP_I2C_REG_VOLTAGE_INPUT_NOW             0
 #define PZP_I2C_REG_VOLTAGE_INPUT_AVG             1
 #define PZP_I2C_REG_TEMPERATURE_BOARD_NOW         2
@@ -6,7 +8,7 @@
 #define PZP_I2C_REG_SWITCH_MAGNET_LATCH           5
 #define PZP_I2C_REG_SEQUENCE_NUMBER               6
 #define PZP_I2C_REG_TIME_INTERVAL_MILLISECONDS    7
-#define PZP_I2C_REG_TIME_UPTIME_MINUTE            8
+#define PZP_I2C_REG_TIME_UPTIME_MINUTES           8
 #define PZP_I2C_REG_TIME_WATCHDOG_READ_SECONDS    9
 #define PZP_I2C_REG_TIME_WATCHDOG_WRITE_SECONDS   10
 

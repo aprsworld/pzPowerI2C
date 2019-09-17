@@ -63,7 +63,7 @@ int16 map_i2c(int8 addr) {
 			return (int16) current.sequence_number++;
 		case PZP_I2C_REG_TIME_INTERVAL_MILLISECONDS: 
 			return (int16) current.interval_milliseconds; /* milliseconds since last query */
-		case PZP_I2C_REG_TIME_UPTIME_MINUTE: 
+		case PZP_I2C_REG_TIME_UPTIME_MINUTES: 
 			return (int16) current.uptime_minutes; 
 		case PZP_I2C_REG_TIME_WATCHDOG_READ_SECONDS: 
 			return (int16) current.read_watchdog_seconds; 

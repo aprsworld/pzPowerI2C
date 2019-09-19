@@ -38,10 +38,6 @@ void ssp_interrupt () {
 				/* 16 bit value made of previous byte and this byte */
 				write_i2c(address,make16(lastMSB,incoming));
 			}
-
-
-			/* reset write watchdog */
-			current.write_watchdog_seconds=0;
 			
 
 //			address++;

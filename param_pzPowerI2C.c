@@ -49,6 +49,15 @@ void write_default_param_file() {
 
 	config.startup_power_on_delay=5;
 
+	config.command_off_hold_time=2;
+
+	config.read_watchdog_off_threshold=65535;
+	config.read_watchdog_off_hold_time=2;
+
+
+	config.write_watchdog_off_threshold=65535;
+	config.write_watchdog_off_hold_time=2;
+
 	/* write them so next time we use from EEPROM */
 	write_param_file();
 

@@ -223,8 +223,15 @@ void periodic_millisecond(void) {
 		}
 
 		/* check if watchdog exceeds threshold */
+		if ( current.read_watchdog_seconds > config.read_watchdog_off_threshold ) {
+			bit_set(current.power_off_flags,POWER_FLAG_POS_READ_WATCHDOG);
+		} else {
+			bit_clear(current.power_off_flags,POWER_FLAG_POS_READ_WATCHDOG);
+		}
 		if ( current.write_watchdog_seconds > config.write_watchdog_off_threshold ) {
 			bit_set(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
+		} else {
+			bit_clear(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
 		}
 
 

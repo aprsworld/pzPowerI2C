@@ -45,11 +45,10 @@ void write_default_param_file() {
 
 	config.adc_sample_ticks=20;
 
-
-	config.power_startup=0;
+	config.startup_power_on_delay=5;
 
 	/* write them so next time we use from EEPROM */
-//	write_param_file();
+	write_param_file();
 
 }
 

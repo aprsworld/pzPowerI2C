@@ -3,28 +3,37 @@
 void write_i2c(int8 address, int16 value) {
 	switch ( address ) {
 		case  PZP_I2C_REG_SWITCH_MAGNET_LATCH: 
-				current.latch_sw_magnet=0;
-				break;
+			current.latch_sw_magnet=0;
+			break;
 		case PZP_I2C_REG_TIME_WATCHDOG_WRITE_SECONDS:
-				current.write_watchdog_seconds=0;
-				break;
+			current.write_watchdog_seconds=0;
+			break;
 		case PZP_I2C_REG_CONFIG_SERIAL_PREFIX: 
-				if ( value >= 'A' && value <='Z' ) 
-					config.serial_prefix=value;
-				break;
+			if ( current.factory_unlocked && value >= 'A' && value <='Z' ) 
+				config.serial_prefix=value;
+			break;
 		case PZP_I2C_REG_CONFIG_SERIAL_NUMBER:
+			if (  current.factory_unlocked  ) {
 				config.serial_number=value;
-				break;
+			}
+			break;
 		case PZP_I2C_REG_CONFIG_PARAM_WRITE:
-				if ( 1 == value ) {
-					timers.now_write_config=1;
-				} else if ( 2 == value ) {
-					timers.now_reset_config=1;
-				} else if ( 1802 == value ) {
-					timers.now_factory_unlock=1;
-				} else if ( 65535 == value ) {
-					reset_cpu();
-				}
+			if ( 1 == value ) {
+				timers.now_write_config=1;
+			} else if ( 2 == value ) {
+				timers.now_reset_config=1;
+			} else if ( 1802 == value ) {
+				current.factory_unlocked =1;
+			} else if ( 65535 == value ) {
+				reset_cpu();
+			}
+			break;
+		case PZP_I2C_REG_CONFIG_TICKS_ADC:
+			config.adc_sample_ticks=value;
+			break;
+		case PZP_I2C_REG_CONFIG_STARTUP_POWER_ON_DELAY:
+			config.startup_power_on_delay=value;
+			break;
 		default:
 			/* do nothing */
 	}
@@ -86,11 +95,11 @@ int16 map_i2c(int8 addr) {
 			return (int16) 3;
 		case PZP_I2C_REG_CONFIG_PARAM_WRITE:
 			/* 1 if factory unlocked */ 
-			return (int16) timers.now_factory_unlock; 	
+			return (int16) current.factory_unlocked; 	
 		case PZP_I2C_REG_CONFIG_TICKS_ADC: 
 			return (int16) config.adc_sample_ticks;
 		case PZP_I2C_REG_CONFIG_STARTUP_POWER_ON_DELAY: 
-			return (int16) config.power_startup;
+			return (int16) config.startup_power_on_delay;
 		
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */

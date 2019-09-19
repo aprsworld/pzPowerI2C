@@ -7,12 +7,7 @@ typedef struct {
 
 	int16 adc_sample_ticks;
 
-
-	/* power control switch settings */
-	int8 power_startup; /* 0==start with PI off, 1==start with PI on */
-
-
-//	int8 pic_to_pi_latch_mask;
+	int16 startup_power_on_delay;
 } struct_config;
 
 
@@ -34,6 +29,8 @@ typedef struct {
 	/* power control switch */
 	int8 p_on;
 	int16 power_on_delay;
+
+
 	int16 power_off_delay;
 	int16 power_override_timeout;
 
@@ -52,13 +49,12 @@ typedef struct {
 
 	int1 now_write_config;
 	int1 now_reset_config;
-	int1 now_factory_unlock;
 } struct_time_keep;
 
 /* global structures */
-struct_config config;
-struct_current current;
-struct_time_keep timers;
+struct_config config={0};
+struct_current current={0};
+struct_time_keep timers={0};
 
 #include "adc_pzPowerI2C.c"
 #include "param_pzPowerI2C.c"
@@ -90,7 +86,6 @@ void init(void) {
 	timers.now_millisecond=0;
 	timers.now_write_config=0;
 	timers.now_reset_config=0;
-	timers.now_factory_unlock=0;
 
 
 	current.sequence_number=0;
@@ -211,8 +206,14 @@ void main(void) {
 	output_low(PI_POWER_EN);
 	output_low(WIFI_POWER_EN);
 
+
+	read_param_file();
+
+	if ( config.startup_power_on_delay > 100 )
+		config.startup_power_on_delay=100;
+
 	/* flash on startup */
-	for ( i=0 ; i<5 ; i++ ) {
+	for ( i=0 ; i<config.startup_power_on_delay ; i++ ) {
 		restart_wdt();
 		output_high(PIC_LED_GREEN);
 		delay_ms(200);
@@ -221,12 +222,11 @@ void main(void) {
 	}
 
 
-	read_param_file();
 
 
 
 //	if ( config.modbus_address > 128 ) {
-		write_default_param_file();
+//		write_default_param_file();
 //	}
 
 	timers.led_on_green=500;
@@ -239,7 +239,7 @@ void main(void) {
 	}
 
 	/* set power switch to initial state */
-	current.p_on=config.power_startup;
+//	current.p_on=config.power_startup;
 
 
 	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
@@ -266,7 +266,7 @@ void main(void) {
 			write_param_file();
 		}
 		if ( timers.now_reset_config ) {
-			timers.now_write_config=0;
+			timers.now_reset_config=0;
 			write_default_param_file();
 		}
 

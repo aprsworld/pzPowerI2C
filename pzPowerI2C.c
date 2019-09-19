@@ -8,6 +8,15 @@ typedef struct {
 	int16 adc_sample_ticks;
 
 	int16 startup_power_on_delay;
+
+	/* command_off in current */
+	int16 command_off_hold_time;
+
+	int16 read_watchdog_off_threshold;
+	int16 read_watchdog_off_hold_time;
+
+	int16 write_watchdog_off_threshold;
+	int16 write_watchdog_off_hold_time;
 } struct_config;
 
 
@@ -26,18 +35,30 @@ typedef struct {
 	int16 read_watchdog_seconds;
 	int16 write_watchdog_seconds;
 
-	/* power control switch */
-	int8 p_on;
-	int16 power_on_delay;
+	int8 compile_year;
+	int8 compile_month;
+	int8 compile_day;
 
+	/* bit position
+		7
+		6 htd
+		5 ltd
+		4 hvd
+		3 lvd
+		2 write watchdog
+		1 read watchdog
+		0 command
+	*/
 
-	int16 power_off_delay;
-	int16 power_override_timeout;
+	int8 power_on_flags;
+	int8 power_off_flags; 	
 
 	/* magnet sensor on board */
 	int8 latch_sw_magnet;
 
 	int8 default_params_written;
+
+	int16 command_off;
 } struct_current;
 
 typedef struct {
@@ -64,6 +85,7 @@ struct_time_keep timers={0};
 #include "interrupt_pzPowerI2C.c"
 
 void init(void) {
+	int8 buff[32];
 	setup_oscillator(OSC_16MHZ);
 
 	setup_adc(ADC_CLOCK_DIV_16);
@@ -99,6 +121,45 @@ void init(void) {
 	current.write_watchdog_seconds=0;
 	current.latch_sw_magnet=0;
 	current.default_params_written=0;
+
+	/* get our compiled date from constant */
+	strcpy(buff,__DATE__);
+	current.compile_day =(buff[0]-'0')*10;
+	current.compile_day+=(buff[1]-'0');
+	/* determine month ... how annoying */
+	if ( 'J'==buff[3] ) {
+		if ( 'A'==buff[4] )
+			current.compile_month=1;
+		else if ( 'N'==buff[5] )
+			current.compile_month=6;
+		else
+			current.compile_month=7;
+	} else if ( 'A'==buff[3] ) {
+		if ( 'P'==buff[4] )
+			current.compile_month=4;
+		else
+			current.compile_month=8;
+	} else if ( 'M'==buff[3] ) {
+		if ( 'R'==buff[5] )
+			current.compile_month=3;
+		else
+			current.compile_month=5;
+	} else if ( 'F'==buff[3] ) {
+		current.compile_month=2;
+	} else if ( 'S'==buff[3] ) {
+		current.compile_month=9;
+	} else if ( 'O'==buff[3] ) {
+		current.compile_month=10;
+	} else if ( 'N'==buff[3] ) {
+		current.compile_month=11;
+	} else if ( 'D'==buff[3] ) {
+		current.compile_month=12;
+	} else {
+		/* error parsing, shouldn't happen */
+		current.compile_month=255;
+	}
+	current.compile_year =(buff[7]-'0')*10;
+	current.compile_year+=(buff[8]-'0');
 
 
 	/* one periodic interrupt @ 1mS. Generated from system 16 MHz clock */

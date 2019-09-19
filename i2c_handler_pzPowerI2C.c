@@ -34,6 +34,21 @@ void write_i2c(int8 address, int16 value) {
 		case PZP_I2C_REG_CONFIG_STARTUP_POWER_ON_DELAY:
 			config.startup_power_on_delay=value;
 			break;
+		case PZP_I2C_REG_CONFIG_COMMAND_OFF_HOLD_TIME:
+			config.command_off_hold_time=value;
+			break;
+		case PZP_I2C_REG_CONFIG_READ_WATCHDOG_OFF_THRESHOLD:
+			config.read_watchdog_off_threshold=value;
+			break;
+		case PZP_I2C_REG_CONFIG_READ_WATCHDOG_OFF_HOLD_TIME:
+			config.read_watchdog_off_hold_time=value;
+			break;
+		case PZP_I2C_REG_CONFIG_WRITE_WATCHDOG_OFF_THRESHOLD:
+			config.write_watchdog_off_threshold=value;
+			break;
+		case PZP_I2C_REG_CONFIG_WRITE_WATCHDOG_OFF_HOLD_TIME:
+			config.write_watchdog_off_hold_time=value;
+			break;
 		default:
 			/* do nothing */
 	}
@@ -80,6 +95,8 @@ int16 map_i2c(int8 addr) {
 			return (int16) current.write_watchdog_seconds;
 		case PZP_I2C_REG_DEFAULT_PARAMS_WRITTEN:
 			return (int16) current.default_params_written;
+		case PZP_I2C_REG_COMMAND_OFF:
+			return (int16) current.command_off;
 
 
 		/* configuration */
@@ -95,6 +112,13 @@ int16 map_i2c(int8 addr) {
 			return (int16) 'P';
 		case PZP_I2C_REG_CONFIG_SOFTWARE_VERSION: 
 			return (int16) 3;
+		case PZP_I2C_REG_CONFIG_SOFTWARE_YEAR:
+			return (int16) current.compile_year;
+		case PZP_I2C_REG_CONFIG_SOFTWARE_MONTH:
+			return (int16) current.compile_month;
+		case PZP_I2C_REG_CONFIG_SOFTWARE_DAY:
+			return (int16) current.compile_day;
+
 		case PZP_I2C_REG_CONFIG_PARAM_WRITE:
 			/* 1 if factory unlocked */ 
 			return (int16) current.factory_unlocked; 	
@@ -102,7 +126,17 @@ int16 map_i2c(int8 addr) {
 			return (int16) config.adc_sample_ticks;
 		case PZP_I2C_REG_CONFIG_STARTUP_POWER_ON_DELAY: 
 			return (int16) config.startup_power_on_delay;
-		
+		case PZP_I2C_REG_CONFIG_COMMAND_OFF_HOLD_TIME:
+			return (int16) config.command_off_hold_time;
+		case PZP_I2C_REG_CONFIG_READ_WATCHDOG_OFF_THRESHOLD:
+			return (int16) config.read_watchdog_off_threshold;
+		case PZP_I2C_REG_CONFIG_READ_WATCHDOG_OFF_HOLD_TIME:
+			return (int16) config.read_watchdog_off_hold_time;
+		case PZP_I2C_REG_CONFIG_WRITE_WATCHDOG_OFF_THRESHOLD:
+			return (int16) config.write_watchdog_off_threshold;
+		case PZP_I2C_REG_CONFIG_WRITE_WATCHDOG_OFF_HOLD_TIME:
+			return (int16) config.write_watchdog_off_hold_time;
+
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */
 		default: return (int16) addr;

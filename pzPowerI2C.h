@@ -30,6 +30,9 @@
 
 #use rs232(UART1,stream=STREAM_PI,baud=9600,errors)	
 
+/* program config CRC of 0 and a serial_prefix of 'A' ... that will trigger a write default on first boot */
+#ROM 0xF00000 = { 0x00, 0x00, 0x40, 0x00 }
+
 #define PI_POWER_EN          PIN_C4
 #define WIFI_POWER_EN        PIN_C5
 #define PIC_LED_GREEN        PIN_C6
@@ -46,5 +49,4 @@ Parameters are stored in EEPROM
 #define PARAM_CRC_ADDRESS  0x00
 #define PARAM_ADDRESS      PARAM_CRC_ADDRESS+2
 
-#define EE_FOR_HOST_ADDRESS 128
 

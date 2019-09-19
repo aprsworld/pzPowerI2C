@@ -36,6 +36,8 @@ void write_param_file() {
 }
 
 void write_default_param_file() {
+	current.default_params_written=1;
+
 	/* red LED for 1.5 seconds */
 	timers.led_on_green=150;
 

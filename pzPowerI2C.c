@@ -36,6 +36,8 @@ typedef struct {
 
 	/* magnet sensor on board */
 	int8 latch_sw_magnet;
+
+	int8 default_params_written;
 } struct_current;
 
 typedef struct {
@@ -96,6 +98,7 @@ void init(void) {
 	current.read_watchdog_seconds=0;
 	current.write_watchdog_seconds=0;
 	current.latch_sw_magnet=0;
+	current.default_params_written=0;
 
 
 	/* one periodic interrupt @ 1mS. Generated from system 16 MHz clock */
@@ -206,7 +209,7 @@ void main(void) {
 	output_low(PI_POWER_EN);
 	output_low(WIFI_POWER_EN);
 
-
+	/* read parameters from EEPROM and write defaults if CRC doesn't match */
 	read_param_file();
 
 	if ( config.startup_power_on_delay > 100 )

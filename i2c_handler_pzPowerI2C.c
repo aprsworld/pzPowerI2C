@@ -78,6 +78,8 @@ int16 map_i2c(int8 addr) {
 			return (int16) current.read_watchdog_seconds; 
 		case PZP_I2C_REG_TIME_WATCHDOG_WRITE_SECONDS: 
 			return (int16) current.write_watchdog_seconds;
+		case PZP_I2C_REG_DEFAULT_PARAMS_WRITTEN:
+			return (int16) current.default_params_written;
 
 
 		/* configuration */

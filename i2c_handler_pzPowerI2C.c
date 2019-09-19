@@ -97,6 +97,12 @@ int16 map_i2c(int8 addr) {
 			return (int16) current.default_params_written;
 		case PZP_I2C_REG_COMMAND_OFF:
 			return (int16) current.command_off;
+		case PZP_I2C_REG_POWER_ON_FLAGS:
+			return (int16) current.power_on_flags;
+		case PZP_I2C_REG_POWER_OFF_FLAGS:
+			return (int16) current.power_off_flags;
+		case PZP_I2C_REG_POWER_STATE:
+			return (int16) current.power_state;
 
 
 		/* configuration */

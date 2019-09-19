@@ -13,6 +13,11 @@
 #define PZP_I2C_REG_TIME_WATCHDOG_WRITE_SECONDS   10
 #define PZP_I2C_REG_DEFAULT_PARAMS_WRITTEN        11
 #define PZP_I2C_REG_COMMAND_OFF                   12
+#define PZP_I2C_REG_POWER_ON_FLAGS                13
+#define PZP_I2C_REG_POWER_OFF_FLAGS               14
+#define PZP_I2C_REG_POWER_STATE                   15
+
+
 
 
 

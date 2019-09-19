@@ -50,3 +50,12 @@ Parameters are stored in EEPROM
 #define PARAM_ADDRESS      PARAM_CRC_ADDRESS+2
 
 
+#define POWER_FLAG_POS_HTD            6
+#define POWER_FLAG_POS_LTD            5
+#define POWER_FLAG_POS_HVD            4
+#define POWER_FLAG_POS_LVD            3
+#define POWER_FLAG_POS_WRITE_WATCHDOG 2
+#define POWER_FLAG_POS_READ_WATCHDOG  1
+#define POWER_FLAG_POS_COMMAND        0
+
+

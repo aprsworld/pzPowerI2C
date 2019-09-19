@@ -49,9 +49,21 @@ typedef struct {
 		1 read watchdog
 		0 command
 	*/
-
 	int8 power_on_flags;
-	int8 power_off_flags; 	
+	int8 power_off_flags; 
+
+	/* bit positions
+		7
+		6
+		5
+		4
+		3
+		2
+		1 usb (wifi)
+		0 pi (host)
+	*/
+	int8 power_state;
+	
 
 	/* magnet sensor on board */
 	int8 latch_sw_magnet;
@@ -202,13 +214,19 @@ void periodic_millisecond(void) {
 	if ( 1000 == ticks ) {
 		ticks=0;
 
-		/* watchdog power control of pi */
+		/* watchdog counters */
 		if ( current.read_watchdog_seconds != 65535 ) {
 			current.read_watchdog_seconds++;
 		}
 		if ( current.write_watchdog_seconds != 65535 ) {
 			current.write_watchdog_seconds++;
 		}
+
+		/* check if watchdog exceeds threshold */
+		if ( current.write_watchdog_seconds > config.write_watchdog_off_threshold ) {
+			bit_set(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
+		}
+
 
 #if 0
 		/* shut off when:

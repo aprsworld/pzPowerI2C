@@ -8,6 +8,9 @@ void write_i2c(int8 address, int16 value) {
 		case PZP_I2C_REG_TIME_WATCHDOG_WRITE_SECONDS:
 			timers.write_watchdog_seconds=0;
 			break;
+		case PZP_I2C_REG_COMMAND_OFF:
+			timers.command_off_seconds=value;
+			break;
 		case PZP_I2C_REG_CONFIG_SERIAL_PREFIX: 
 			if ( current.factory_unlocked && value >= 'A' && value <='Z' ) 
 				config.serial_prefix=value;

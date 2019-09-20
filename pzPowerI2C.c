@@ -219,7 +219,7 @@ void periodic_millisecond(void) {
 					if ( 0==timers.command_off_hold_seconds ) {
 						/* countdown elapsed, clear the flag and reset the timer */
 						bit_clear(current.power_off_flags,POWER_FLAG_POS_COMMAND_OFF);
-						timers.command_off_seconds=0;
+						timers.command_off_seconds=65535;
 					} else {
 						timers.command_off_hold_seconds--;
 					}

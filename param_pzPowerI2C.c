@@ -58,6 +58,11 @@ void write_default_param_file() {
 	config.write_watchdog_off_threshold=65535;
 	config.write_watchdog_off_hold_time=2;
 
+	config.lvd_disconnect_adc=190;
+	config.lvd_disconnect_delay=65535;
+	config.lvd_reconnect_adc=200;
+
+
 	/* write them so next time we use from EEPROM */
 	write_param_file();
 

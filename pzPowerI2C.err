@@ -1,3 +1,4 @@
-      Memory usage:   ROM=20%      RAM=30% - 39%
-      0 Errors,  0 Warnings.
+>>> Warning 216 "pzPowerI2C.c" Line 418(1,2): Interrupts disabled during call to prevent re-entrancy:  (adc_get)
+      Memory usage:   ROM=21%      RAM=31% - 40%
+      0 Errors,  1 Warnings.
 Build Successful.

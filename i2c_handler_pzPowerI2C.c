@@ -152,6 +152,12 @@ int16 map_i2c(int8 addr) {
 			return (int16) config.write_watchdog_off_threshold;
 		case PZP_I2C_REG_CONFIG_WRITE_WATCHDOG_OFF_HOLD_TIME:
 			return (int16) config.write_watchdog_off_hold_time;
+		case PZP_I2C_REG_CONFIG_LVD_DISCONNECT_VOLTAGE:
+			return (int16) config.lvd_disconnect_adc;
+		case PZP_I2C_REG_CONFIG_LVD_DISCONNECT_DELAY:
+			return (int16) config.lvd_disconnect_delay;
+		case PZP_I2C_REG_CONFIG_LVD_RECONNECT_VOLTAGE:
+			return (int16) config.lvd_reconnect_adc;
 
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */

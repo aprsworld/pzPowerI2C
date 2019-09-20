@@ -21,7 +21,6 @@ typedef struct {
 	int16 lvd_disconnect_adc;
 	int16 lvd_disconnect_delay;
 	int16 lvd_reconnect_adc;
-
 } struct_config;
 
 
@@ -94,6 +93,9 @@ typedef struct {
 
 	int16 write_watchdog_seconds; 		/* counts up */
 	int16 write_watchdog_hold_seconds; 	/* counts down. Off at zero */
+
+	int16 lvd_disconnect_delay_seconds;	/* counts down */
+	int8  lvd_reconnect_delay_seconds;	/* counts down */
 } struct_time_keep;
 
 /* global structures */
@@ -180,6 +182,7 @@ void periodic_millisecond(void) {
 	static int8 uptimeticks=0;
 	static int16 adcTicks=0;
 	static int16 ticks=0;
+	int16 adc;
 
 
 	timers.now_millisecond=0;
@@ -284,6 +287,33 @@ void periodic_millisecond(void) {
 			bit_clear(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
 		}
 
+		/* LVD off. 65535 disables */
+		if ( 65535 != config.lvd_disconnect_delay ) {
+			adc=adc_get(0);
+
+			if ( adc > config.lvd_reconnect_adc ) {
+				if ( timers.lvd_reconnect_delay_seconds > 0 ) {
+					timers.lvd_reconnect_delay_seconds--;
+				} else {
+					bit_clear(current.power_off_flags,POWER_FLAG_POS_LVD);
+				}
+			} else {
+				timers.lvd_reconnect_delay_seconds=5; /* 5 seconds countdown before reconnecting */
+			}
+
+			if ( adc < config.lvd_disconnect_adc ) {
+				if ( timers.lvd_disconnect_delay_seconds > 0 ) {
+					timers.lvd_disconnect_delay_seconds--;
+				} else {
+					bit_set(current.power_off_flags,POWER_FLAG_POS_LVD);
+				}
+			} else {
+				timers.lvd_disconnect_delay_seconds=config.lvd_disconnect_delay;
+			}
+
+		}
+
+		/* actually control the power switches */
 		if ( current.power_off_flags ) {
 			output_low(PI_POWER_EN);
 			output_low(WIFI_POWER_EN);

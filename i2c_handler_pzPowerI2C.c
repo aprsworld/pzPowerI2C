@@ -52,6 +52,15 @@ void write_i2c(int8 address, int16 value) {
 		case PZP_I2C_REG_CONFIG_WRITE_WATCHDOG_OFF_HOLD_TIME:
 			config.write_watchdog_off_hold_time=value;
 			break;
+		case PZP_I2C_REG_CONFIG_LVD_DISCONNECT_VOLTAGE:
+			config.lvd_disconnect_adc=value;
+			break;
+		case PZP_I2C_REG_CONFIG_LVD_DISCONNECT_DELAY:
+			config.lvd_disconnect_delay=value;
+			break;
+		case PZP_I2C_REG_CONFIG_LVD_RECONNECT_VOLTAGE:
+			config.lvd_reconnect_adc=value;
+			break;
 		default:
 			/* do nothing */
 	}

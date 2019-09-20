@@ -17,6 +17,11 @@ typedef struct {
 
 	int16 write_watchdog_off_threshold;
 	int16 write_watchdog_off_hold_time;
+
+	int16 lvd_disconnect_adc;
+	int16 lvd_disconnect_delay;
+	int16 lvd_reconnect_adc;
+
 } struct_config;
 
 

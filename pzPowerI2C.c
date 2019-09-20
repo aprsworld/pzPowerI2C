@@ -32,8 +32,6 @@ typedef struct {
 
 	int8 factory_unlocked;
 
-	int16 read_watchdog_seconds;
-	int16 write_watchdog_seconds;
 
 	int8 compile_year;
 	int8 compile_month;
@@ -49,7 +47,6 @@ typedef struct {
 		1 read watchdog
 		0 command
 	*/
-	int8 power_on_flags;
 	int8 power_off_flags; 
 
 	/* bit positions
@@ -74,9 +71,7 @@ typedef struct {
 } struct_current;
 
 typedef struct {
-	int8 led_on_green;
-	int16 load_off_seconds;
-
+	/* action flags */
 	int1 now_adc_sample;
 	int1 now_adc_reset_count;
 
@@ -84,6 +79,14 @@ typedef struct {
 
 	int1 now_write_config;
 	int1 now_reset_config;
+
+	/* timers */
+	int8 led_on_green;
+
+	int16 read_watchdog_seconds;  /* counts up */
+	int16 read_watchdog_hold_seconds; /* counts down, off at zero */
+	int16 write_watchdog_seconds; /* counts up */
+	int16 write_watchdog_hold_seconds; /* counts down, off at zero */
 } struct_time_keep;
 
 /* global structures */
@@ -115,24 +118,8 @@ void init(void) {
 //                   76543210
 
 	/* data structure initialization */
-	timers.led_on_green=0;
-	timers.load_off_seconds=2;
-	timers.now_adc_sample=0;
-	timers.now_adc_reset_count=0;
-	timers.now_millisecond=0;
-	timers.now_write_config=0;
-	timers.now_reset_config=0;
+	/* all initialized to 0 on declaration. Just do this if need non-zero */
 
-
-	current.sequence_number=0;
-	current.uptime_minutes=0;
-	current.interval_milliseconds=0;
-	current.adc_buffer_index=0;
-	current.factory_unlocked=0;
-	current.read_watchdog_seconds=0;
-	current.write_watchdog_seconds=0;
-	current.latch_sw_magnet=0;
-	current.default_params_written=0;
 
 	/* get our compiled date from constant */
 	strcpy(buff,__DATE__);
@@ -215,49 +202,44 @@ void periodic_millisecond(void) {
 		ticks=0;
 
 		/* watchdog counters */
-		if ( current.read_watchdog_seconds != 65535 ) {
-			current.read_watchdog_seconds++;
+		if ( timers.read_watchdog_seconds != 65535 ) {
+			timers.read_watchdog_seconds++;
 		}
-		if ( current.write_watchdog_seconds != 65535 ) {
-			current.write_watchdog_seconds++;
+		if ( timers.write_watchdog_seconds != 65535 ) {
+			timers.write_watchdog_seconds++;
 		}
 
 		/* check if watchdog exceeds threshold */
-		if ( current.read_watchdog_seconds > config.read_watchdog_off_threshold ) {
-			bit_set(current.power_off_flags,POWER_FLAG_POS_READ_WATCHDOG);
+		/* TODO read watchdog goes here */
+
+		if ( timers.write_watchdog_seconds > config.write_watchdog_off_threshold ) {
+			/* watchdog counter is above threshold */
+			if ( ! bit_test(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG) ) {
+				/* not currently set, so we set it and start the countdown */
+				bit_set(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
+				timers.write_watchdog_hold_seconds=config.write_watchdog_off_hold_time;
+			} else {
+				/* set, so we clear it once countdown has elapsed */
+				if ( 0==timers.write_watchdog_hold_seconds ) {
+					bit_clear(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
+				} else {
+					timers.write_watchdog_hold_seconds--;
+				}			
+			}	
 		} else {
-			bit_clear(current.power_off_flags,POWER_FLAG_POS_READ_WATCHDOG);
-		}
-		if ( current.write_watchdog_seconds > config.write_watchdog_off_threshold ) {
-			bit_set(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
-		} else {
+			/* watchdog was cleared elsewhere */
 			bit_clear(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
 		}
 
-
-#if 0
-		/* shut off when:
-			a) watchdog_seconds_max != 0 AND watchdog_seconds is greater than watchdog_seconds_max AND it isn't already off 
-		*/
-		if ( 0 != config.watchdog_seconds_max && current.watchdog_seconds > config.watchdog_seconds_max && 0 == timers.load_off_seconds ) {
-			timers.load_off_seconds=config.pi_offtime_seconds;
-		}
-#endif
-
-		/* control power to the raspberrry pi load */
-		if ( 0==timers.load_off_seconds ) {
+		if ( current.power_off_flags ) {
+			output_low(PI_POWER_EN);
+			output_low(WIFI_POWER_EN);
+		} else {
 			output_high(PI_POWER_EN);
 			output_high(WIFI_POWER_EN);
-		} else {
-//			output_low(PI_POWER_EN);
-//			output_low(WIFI_POWER_EN);
-			timers.load_off_seconds--;
-
-			if ( 0 == timers.load_off_seconds ) {
-				/* reset watchdog seconds so we can turn back on */
-				current.read_watchdog_seconds=0;
-			}
 		}
+
+
 
 		
 		/* uptime counter */
@@ -288,8 +270,6 @@ void periodic_millisecond(void) {
 void main(void) {
 	int8 i;
 
-	i=restart_cause();
-
 	init();
 
 	output_low(PI_POWER_EN);
@@ -312,12 +292,6 @@ void main(void) {
 
 
 
-
-
-//	if ( config.modbus_address > 128 ) {
-//		write_default_param_file();
-//	}
-
 	timers.led_on_green=500;
 
 	enable_interrupts(GLOBAL);
@@ -326,12 +300,6 @@ void main(void) {
 	for ( i=0 ; i<30 ; i++ ) {
 		adc_update();
 	}
-
-	/* set power switch to initial state */
-//	current.p_on=config.power_startup;
-
-
-	fprintf(STREAM_PI,"# pzPowerI2C %s\r\n",__DATE__);
 
 	/* enable I2C slave interrupt */
 	enable_interrupts(INT_SSP);
@@ -347,7 +315,6 @@ void main(void) {
 		if ( timers.now_adc_sample ) {
 			timers.now_adc_sample=0;
 			adc_update();
-//			sprintf(buffer,">i=%lu,r=%lu<",adc_get(0),adc_get(1));
 		}
 
 		if ( timers.now_write_config ) {

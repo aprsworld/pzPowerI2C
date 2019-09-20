@@ -62,7 +62,7 @@ void ssp_interrupt () {
 	}
 
 	/* reset watchdog timer */
-	current.read_watchdog_seconds=0;
+	timers.read_watchdog_seconds=0;
 }
 
 

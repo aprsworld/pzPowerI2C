@@ -6,7 +6,7 @@ void write_i2c(int8 address, int16 value) {
 			current.latch_sw_magnet=0;
 			break;
 		case PZP_I2C_REG_TIME_WATCHDOG_WRITE_SECONDS:
-			current.write_watchdog_seconds=0;
+			timers.write_watchdog_seconds=0;
 			break;
 		case PZP_I2C_REG_CONFIG_SERIAL_PREFIX: 
 			if ( current.factory_unlocked && value >= 'A' && value <='Z' ) 
@@ -90,15 +90,13 @@ int16 map_i2c(int8 addr) {
 		case PZP_I2C_REG_TIME_UPTIME_MINUTES: 
 			return (int16) current.uptime_minutes; 
 		case PZP_I2C_REG_TIME_WATCHDOG_READ_SECONDS: 
-			return (int16) current.read_watchdog_seconds; 
+			return (int16) timers.read_watchdog_seconds; 
 		case PZP_I2C_REG_TIME_WATCHDOG_WRITE_SECONDS: 
-			return (int16) current.write_watchdog_seconds;
+			return (int16) timers.write_watchdog_seconds;
 		case PZP_I2C_REG_DEFAULT_PARAMS_WRITTEN:
 			return (int16) current.default_params_written;
 		case PZP_I2C_REG_COMMAND_OFF:
 			return (int16) current.command_off;
-		case PZP_I2C_REG_POWER_ON_FLAGS:
-			return (int16) current.power_on_flags;
 		case PZP_I2C_REG_POWER_OFF_FLAGS:
 			return (int16) current.power_off_flags;
 		case PZP_I2C_REG_POWER_STATE:

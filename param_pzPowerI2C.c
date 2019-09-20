@@ -62,6 +62,9 @@ void write_default_param_file() {
 	config.lvd_disconnect_delay=65535;
 	config.lvd_reconnect_adc=200;
 
+	config.hvd_disconnect_adc=1000;
+	config.hvd_disconnect_delay=65535;
+	config.hvd_reconnect_adc=900;
 
 	/* write them so next time we use from EEPROM */
 	write_param_file();

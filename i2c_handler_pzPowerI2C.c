@@ -61,6 +61,15 @@ void write_i2c(int8 address, int16 value) {
 		case PZP_I2C_REG_CONFIG_LVD_RECONNECT_VOLTAGE:
 			config.lvd_reconnect_adc=value;
 			break;
+		case PZP_I2C_REG_CONFIG_HVD_DISCONNECT_VOLTAGE:
+			config.hvd_disconnect_adc=value;
+			break;
+		case PZP_I2C_REG_CONFIG_HVD_DISCONNECT_DELAY:
+			config.hvd_disconnect_delay=value;
+			break;
+		case PZP_I2C_REG_CONFIG_HVD_RECONNECT_VOLTAGE:
+			config.hvd_reconnect_adc=value;
+			break;
 		default:
 			/* do nothing */
 	}
@@ -111,8 +120,6 @@ int16 map_i2c(int8 addr) {
 			return (int16) timers.command_off_seconds;
 		case PZP_I2C_REG_POWER_OFF_FLAGS:
 			return (int16) current.power_off_flags;
-		case PZP_I2C_REG_POWER_STATE:
-			return (int16) current.power_state;
 
 
 		/* configuration */
@@ -158,6 +165,12 @@ int16 map_i2c(int8 addr) {
 			return (int16) config.lvd_disconnect_delay;
 		case PZP_I2C_REG_CONFIG_LVD_RECONNECT_VOLTAGE:
 			return (int16) config.lvd_reconnect_adc;
+		case PZP_I2C_REG_CONFIG_HVD_DISCONNECT_VOLTAGE:
+			return (int16) config.hvd_disconnect_adc;
+		case PZP_I2C_REG_CONFIG_HVD_DISCONNECT_DELAY:
+			return (int16) config.hvd_disconnect_delay;
+		case PZP_I2C_REG_CONFIG_HVD_RECONNECT_VOLTAGE:
+			return (int16) config.hvd_reconnect_adc;
 
 
 		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */

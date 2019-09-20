@@ -21,6 +21,10 @@ typedef struct {
 	int16 lvd_disconnect_adc;
 	int16 lvd_disconnect_delay;
 	int16 lvd_reconnect_adc;
+
+	int16 hvd_disconnect_adc;
+	int16 hvd_disconnect_delay;
+	int16 hvd_reconnect_adc;
 } struct_config;
 
 
@@ -63,8 +67,6 @@ typedef struct {
 		1 usb (wifi)
 		0 pi (host)
 	*/
-	int8 power_state;
-	
 
 	/* magnet sensor on board */
 	int8 latch_sw_magnet;
@@ -96,6 +98,10 @@ typedef struct {
 
 	int16 lvd_disconnect_delay_seconds;	/* counts down */
 	int8  lvd_reconnect_delay_seconds;	/* counts down */
+
+	int16 hvd_disconnect_delay_seconds;	/* counts down */
+	int8  hvd_reconnect_delay_seconds;	/* counts down */
+
 } struct_time_keep;
 
 /* global structures */
@@ -287,7 +293,7 @@ void periodic_millisecond(void) {
 			bit_clear(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
 		}
 
-		/* LVD off. 65535 disables */
+		/* LVD. 65535 disables */
 		if ( 65535 != config.lvd_disconnect_delay ) {
 			adc=adc_get(0);
 
@@ -310,8 +316,34 @@ void periodic_millisecond(void) {
 			} else {
 				timers.lvd_disconnect_delay_seconds=config.lvd_disconnect_delay;
 			}
-
 		}
+
+		/* HVD. 65535 disables */
+		if ( 65535 != config.hvd_disconnect_delay ) {
+			adc=adc_get(0);
+
+			if ( adc < config.hvd_reconnect_adc ) {
+				if ( timers.hvd_reconnect_delay_seconds > 0 ) {
+					timers.hvd_reconnect_delay_seconds--;
+				} else {
+					bit_clear(current.power_off_flags,POWER_FLAG_POS_HVD);
+				}
+			} else {
+				timers.hvd_reconnect_delay_seconds=5; /* 5 seconds countdown before reconnecting */
+			}
+
+			if ( adc > config.hvd_disconnect_adc ) {
+				if ( timers.hvd_disconnect_delay_seconds > 0 ) {
+					timers.hvd_disconnect_delay_seconds--;
+				} else {
+					bit_set(current.power_off_flags,POWER_FLAG_POS_HVD);
+				}
+			} else {
+				timers.hvd_disconnect_delay_seconds=config.hvd_disconnect_delay;
+			}
+		}
+
+
 
 		/* actually control the power switches */
 		if ( current.power_off_flags ) {

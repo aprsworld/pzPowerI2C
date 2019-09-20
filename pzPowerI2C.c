@@ -66,8 +66,6 @@ typedef struct {
 	int8 latch_sw_magnet;
 
 	int8 default_params_written;
-
-	int16 command_off;
 } struct_current;
 
 typedef struct {
@@ -83,10 +81,14 @@ typedef struct {
 	/* timers */
 	int8 led_on_green;
 
-	int16 read_watchdog_seconds;  /* counts up */
-	int16 read_watchdog_hold_seconds; /* counts down, off at zero */
-	int16 write_watchdog_seconds; /* counts up */
-	int16 write_watchdog_hold_seconds; /* counts down, off at zero */
+	int16 command_off_seconds;			/* counts down. Off at zero. */
+	int16 command_off_hold_seconds;     /* counts down. Off at zero. */
+
+	int16 read_watchdog_seconds;  		/* counts up */
+	int16 read_watchdog_hold_seconds; 	/* counts down. Off at zero */
+
+	int16 write_watchdog_seconds; 		/* counts up */
+	int16 write_watchdog_hold_seconds; 	/* counts down. Off at zero */
 } struct_time_keep;
 
 /* global structures */
@@ -119,7 +121,7 @@ void init(void) {
 
 	/* data structure initialization */
 	/* all initialized to 0 on declaration. Just do this if need non-zero */
-
+	timers.command_off_seconds=65535;
 
 	/* get our compiled date from constant */
 	strcpy(buff,__DATE__);
@@ -201,6 +203,30 @@ void periodic_millisecond(void) {
 	if ( 1000 == ticks ) {
 		ticks=0;
 
+		/* command off. 65535 disables */
+		if ( 65535 != timers.command_off_seconds ) {
+			if ( timers.command_off_seconds > 0 ) {
+				/* waiting to power off */
+				timers.command_off_seconds--;
+			} else {
+				/* timer at zero, ready to power off or already powered off */
+				if ( ! bit_test(current.power_off_flags,POWER_FLAG_POS_COMMAND_OFF) ) {
+					/* not currently set, so we set it and start the countdown */
+					bit_set(current.power_off_flags,POWER_FLAG_POS_COMMAND_OFF);
+					timers.command_off_hold_seconds=config.command_off_hold_time;
+				} else {
+					/* set, so we clear it once countdown has elapsed */
+					if ( 0==timers.command_off_hold_seconds ) {
+						/* countdown elapsed, clear the flag and reset the timer */
+						bit_clear(current.power_off_flags,POWER_FLAG_POS_COMMAND_OFF);
+						timers.command_off_seconds=0;
+					} else {
+						timers.command_off_hold_seconds--;
+					}
+				}		
+			}
+		}
+
 		/* watchdog counters */
 		if ( timers.read_watchdog_seconds != 65535 ) {
 			timers.read_watchdog_seconds++;
@@ -209,9 +235,29 @@ void periodic_millisecond(void) {
 			timers.write_watchdog_seconds++;
 		}
 
-		/* check if watchdog exceeds threshold */
-		/* TODO read watchdog goes here */
+		/* read watchdog */
+		if ( timers.read_watchdog_seconds > config.read_watchdog_off_threshold ) {
+			/* watchdog counter is above threshold */
+			if ( ! bit_test(current.power_off_flags,POWER_FLAG_POS_READ_WATCHDOG) ) {
+				/* not currently set, so we set it and start the countdown */
+				bit_set(current.power_off_flags,POWER_FLAG_POS_READ_WATCHDOG);
+				timers.read_watchdog_hold_seconds=config.read_watchdog_off_hold_time;
+			} else {
+				/* set, so we clear it once countdown has elapsed */
+				if ( 0==timers.read_watchdog_hold_seconds ) {
+					/* countdown elapsed, clear the flag and reset the timer */
+					bit_clear(current.power_off_flags,POWER_FLAG_POS_READ_WATCHDOG);
+					timers.read_watchdog_seconds=0;
+				} else {
+					timers.read_watchdog_hold_seconds--;
+				}			
+			}	
+		} else {
+			/* watchdog was cleared elsewhere */
+			bit_clear(current.power_off_flags,POWER_FLAG_POS_READ_WATCHDOG);
+		}
 
+		/* write watchdog */
 		if ( timers.write_watchdog_seconds > config.write_watchdog_off_threshold ) {
 			/* watchdog counter is above threshold */
 			if ( ! bit_test(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG) ) {
@@ -221,7 +267,9 @@ void periodic_millisecond(void) {
 			} else {
 				/* set, so we clear it once countdown has elapsed */
 				if ( 0==timers.write_watchdog_hold_seconds ) {
+					/* countdown elapsed, clear the flag and reset the timer */
 					bit_clear(current.power_off_flags,POWER_FLAG_POS_WRITE_WATCHDOG);
+					timers.write_watchdog_seconds=0;
 				} else {
 					timers.write_watchdog_hold_seconds--;
 				}			

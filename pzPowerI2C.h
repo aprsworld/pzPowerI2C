@@ -56,6 +56,6 @@ Parameters are stored in EEPROM
 #define POWER_FLAG_POS_LVD            3
 #define POWER_FLAG_POS_WRITE_WATCHDOG 2
 #define POWER_FLAG_POS_READ_WATCHDOG  1
-#define POWER_FLAG_POS_COMMAND        0
+#define POWER_FLAG_POS_COMMAND_OFF    0
 
 

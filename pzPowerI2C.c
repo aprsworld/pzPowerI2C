@@ -124,7 +124,7 @@ void init(void) {
 
 
 	set_tris_a(0b00101111);
-	set_tris_b(0b01110000);
+	set_tris_b(0b11110000);
 	set_tris_c(0b00000001);
 //               76543210
 
@@ -136,7 +136,10 @@ void init(void) {
 	/* all initialized to 0 on declaration. Just do this if need non-zero */
 	timers.command_off_seconds=65535;
 
-	/* get our compiled date from constant */
+	/* 
+	get our compiled date from constant like "04-Dec-21" 
+	                                          012345678
+	*/
 	strcpy(buff,__DATE__);
 	current.compile_day =(buff[0]-'0')*10;
 	current.compile_day+=(buff[1]-'0');

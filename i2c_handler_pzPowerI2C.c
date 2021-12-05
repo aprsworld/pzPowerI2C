@@ -82,7 +82,10 @@ int16 map_i2c(int8 addr) {
 	timers.led_on_green=100;
 
 
-
+#if 0
+	/* just echo back our requested address */
+	return (int16) addr;
+#else
 	switch ( addr ) {
 		/* analog channels */
 		/* input voltage */
@@ -173,9 +176,10 @@ int16 map_i2c(int8 addr) {
 			return (int16) config.hvd_reconnect_adc;
 
 
-		/* we should have range checked, and never gotten here ... or read unimplemented (future) register */
+		/* just return the called address */
 		default: return (int16) addr;
 	}
+#endif
 
 }
 

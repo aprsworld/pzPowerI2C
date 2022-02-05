@@ -37,8 +37,7 @@
 #define SW_MAGNET            PIN_A5
 #define PI_POWER_EN          PIN_C4
 #define WIFI_POWER_EN        PIN_C5 /* not present on ethernet models */
-#define _PIC_LED_GREEN        PIN_C6
-#define PIC_LED_GREEN   PIN_C2
+#define PIC_LED_GREEN        PIN_C6
 #define SER_TO_PI            PIN_B7 /* not present on WiFI models. Also may not be a good idea due to 5V */
 
 #define AN_VTEMP             PIN_A2

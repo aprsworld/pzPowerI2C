@@ -114,9 +114,7 @@ void ssp_interrupt () {
 			/* i2c_read(2) casues the function to read the SSPBUF without releasing the clock */
 			incoming = i2c_read(2);
 		} else {
-			output_high(_PIC_LED_GREEN);
 			incoming = i2c_read();
-			output_low(_PIC_LED_GREEN); 
 		}
 
 		if ( 1 == state ) {      
@@ -139,8 +137,6 @@ void ssp_interrupt () {
 	if ( state >= 0x80 ) {
 		/* I2C master is requesting data from us */
 
-#if 1		
-		/* this doesn't */
 		if ( ! bit_test(address,0) ) {
 			/* read 16 bit register (register address half of I2C address) on even address */
 			lastValue=map_i2c(address>>1);
@@ -151,11 +147,6 @@ void ssp_interrupt () {
 			/* send LSB of 16 bit register on odd address */
 			i2c_write(make8(lastValue,0));
 		}
-#else
-		/* this works */
-		i2c_write(state);
-#endif
-		
 
 		address++;
 	}

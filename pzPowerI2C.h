@@ -20,11 +20,11 @@ to see if anything has been overriden!
 #fuses NOPLLEN
 #fuses NOFCMEN
 #fuses NOIESO
-#fuses BROWNOUT
+#fuses NOBROWNOUT /* brownout resetting when turning on PI! */
 #fuses BORV30
 #fuses NOPUT
 #fuses WDT
-#fuses WDT128     /* this can be override by setup_wdt() */
+#fuses WDT512     /* this can be override by setup_wdt() */
 #fuses NOHFOFST
 #fuses NOMCLR
 #fuses STVREN

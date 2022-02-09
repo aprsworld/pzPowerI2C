@@ -51,7 +51,7 @@ void write_default_param_file() {
 
 	config.command_off_hold_time=2;
 
-	config.read_watchdog_off_threshold=65535;
+	config.read_watchdog_off_threshold=65530; /* approximately 0.75 days */
 	config.read_watchdog_off_hold_time=2;
 
 

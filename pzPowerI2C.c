@@ -115,6 +115,7 @@ struct_time_keep timers={0};
 #include "interrupt_pzPowerI2C.c"
 
 void init(void) {
+	int8 i;
 	int8 buff[32];
 	setup_oscillator(OSC_16MHZ);
 
@@ -136,47 +137,58 @@ void init(void) {
 	/* all initialized to 0 on declaration. Just do this if need non-zero */
 	timers.command_off_seconds=65535;
 
-	/* 
-	get our compiled date from constant like "04-Dec-21" 
-	                                          012345678
+
+	/* get our compiled date from constant  
+	'5-Feb-22'
+	 01234567
+
+	'25-Feb-22'
+	 012345678
 	*/
 	strcpy(buff,__DATE__);
-	current.compile_day =(buff[0]-'0')*10;
-	current.compile_day+=(buff[1]-'0');
+	i=0;
+	if ( '-' != buff[1] ) {
+		/* day can be one or two digits */
+		current.compile_day =(buff[i]-'0')*10;
+		i++;
+	}
+	current.compile_day+=(buff[i]-'0');
+	i+=2; /* now points to month */
+
 	/* determine month ... how annoying */
-	if ( 'J'==buff[3] ) {
-		if ( 'A'==buff[4] )
+	if ( 'J'==buff[i+0] ) {
+		if ( 'A'==buff[i+1] )
 			current.compile_month=1;
-		else if ( 'N'==buff[5] )
+		else if ( 'N'==buff[i+2] )
 			current.compile_month=6;
 		else
 			current.compile_month=7;
-	} else if ( 'A'==buff[3] ) {
-		if ( 'P'==buff[4] )
+	} else if ( 'A'==buff[i+0] ) {
+		if ( 'P'==buff[i+1] )
 			current.compile_month=4;
 		else
 			current.compile_month=8;
-	} else if ( 'M'==buff[3] ) {
-		if ( 'R'==buff[5] )
+	} else if ( 'M'==buff[i+0] ) {
+		if ( 'R'==buff[i+2] )
 			current.compile_month=3;
 		else
 			current.compile_month=5;
-	} else if ( 'F'==buff[3] ) {
+	} else if ( 'F'==buff[i+0] ) {
 		current.compile_month=2;
-	} else if ( 'S'==buff[3] ) {
+	} else if ( 'S'==buff[i+0] ) {
 		current.compile_month=9;
-	} else if ( 'O'==buff[3] ) {
+	} else if ( 'O'==buff[i+0] ) {
 		current.compile_month=10;
-	} else if ( 'N'==buff[3] ) {
+	} else if ( 'N'==buff[i+0] ) {
 		current.compile_month=11;
-	} else if ( 'D'==buff[3] ) {
+	} else if ( 'D'==buff[i+0] ) {
 		current.compile_month=12;
 	} else {
 		/* error parsing, shouldn't happen */
 		current.compile_month=255;
 	}
-	current.compile_year =(buff[7]-'0')*10;
-	current.compile_year+=(buff[8]-'0');
+	current.compile_year =(buff[i+4]-'0')*10;
+	current.compile_year+=(buff[i+5]-'0');
 
 
 	/* one periodic interrupt @ 1mS. Generated from system 16 MHz clock */

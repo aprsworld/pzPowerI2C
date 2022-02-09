@@ -5,13 +5,26 @@
 #use i2c(SLAVE, I2C1, address=0x34, FORCE_HW, NO_STRETCH)
 /* Linux / i2cdetect will use the CCS address >>1. So 0x34 becomes 0x1a */
 
+/* important FUSE notes! 
+MPLAB defaults to DEBUG mode and that will override fuses.
+make sure it is on "BUILD CONFIGURATION" of "RELEASE" under
+"PROJECT" menu.
+
+CCS setup functions can override fuses. Check .LST file
+to see if anything has been overriden!
+*/
+
+#fuses NODEBUG 
 #fuses INTRC_IO
+#fuses NOPCLKEN
 #fuses NOPLLEN
 #fuses NOFCMEN
 #fuses NOIESO
-#fuses PUT
 #fuses BROWNOUT
-#fuses WDT4096
+#fuses BORV30
+#fuses NOPUT
+#fuses WDT
+#fuses WDT128     /* this can be override by setup_wdt() */
 #fuses NOHFOFST
 #fuses NOMCLR
 #fuses STVREN
@@ -25,6 +38,7 @@
 #fuses NOWRTD
 #fuses NOEBTR
 #fuses NOEBTRB
+#fuses BBSIZ1K
 
 #use standard_io(ALL)
 
